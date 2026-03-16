@@ -1,0 +1,37 @@
+WARNING: ../riscvdualfetch/riscvdualfetch-sim.v:183: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ xxxxxxxx |        | -- |        |        |        |        |        }\
+\{ xxxxxxxx |        | -- |        |        |        |        |        }/
+/{ 00080000 |  (-_-) | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 00080004 |  (-_-) | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080000 |  (-_-) | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 00080004 |  (-_-) | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{#00080008 |#addi   | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{#0008000c |#addi   | -- |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080008 | addi   | \/ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{ 0008000c | addi   | /\ |  (-_-) |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{#00080010 |#add    | -- | addi   |  (-_-) |  (-_-) |  (-_-) |  (-_-) }\
+\{#00080014 |#addi   | -- | nop    |  (-_-) |  (-_-) |  (-_-) |  (-_-) }/
+/{ 00080010 | add    | \/ |  (-_-) | addi   |  (-_-) |  (-_-) |  (-_-) }\
+\{ 00080014 | addi   | /\ |  (-_-) | nop    |  (-_-) |  (-_-) |  (-_-) }/
+/{#00080018 |#addi   | -- | addi   |  (-_-) | addi   |  (-_-) |  (-_-) }\
+\{#0008001c |#bne    | -- | nop    |  (-_-) | nop    |  (-_-) |  (-_-) }/
+/{ 00080018 | addi   | \/ |  (-_-) | addi   |  (-_-) | addi   |  (-_-) }\
+\{ 0008001c | bne    | /\ |  (-_-) | nop    |  (-_-) | nop    |  (-_-) }/
+/{ 00080020 | addi   | -- | bne    |  (-_-) | addi   |  (-_-) | addi   }\
+\{ 00080024 | addi   | -- | nop    |  (-_-) | nop    |  (-_-) | nop    }/
+/{#00080020 |#addi   | -- | addi   | bne    |  (-_-) | addi   |  (-_-) }\
+\{#00080024 |#addi   | -- | nop    | nop    |  (-_-) | nop    |  (-_-) }/
+/{#00080020 |#addi   | -- | addi   | bne    | bne    |  (-_-) | addi   }\
+\{#00080024 |#addi   | -- | nop    | nop    | nop    |  (-_-) | nop    }/
+/{ 00080020 | addi   | \/ |  (-_-) | addi   | bne    | bne    |  (-_-) }\
+\{ 00080024 | addi   | /\ |  (-_-) | nop    | nop    | nop    |  (-_-) }/
+ RTL-ERROR : riscv_sim.proc.ctrl : Illegal instruction!
+/{#00080028 |# x     | -- | addi   |  (-_-) | addi   | bne    | bne    }\
+\{#0008002c |# x     | -- | nop    |  (-_-) | nop    | nop    | nop    }/
+/{ 00080028 |  x     | \/ |  (-_-) | addi   |  (-_-) | addi   | bne    }\
+\{ 0008002c |  x     | /\ |  (-_-) | nop    |  (-_-) | nop    | nop    }/
+ RTL-ERROR : riscv_sim.proc.ctrl : Illegal instruction!
