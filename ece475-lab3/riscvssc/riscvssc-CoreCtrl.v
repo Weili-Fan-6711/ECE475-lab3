@@ -96,13 +96,14 @@ module riscv_CoreCtrl
   // PC Mux Select
 
   assign pc_mux_sel_Phl
-    = brj_taken_X0hl    ? pm_b
-    : brj_taken_Dhl    ? pc_mux_sel_Dhl
-    :                    pm_p;
+    = (brj_taken_X0hl === 1'b1) ? pm_b
+    : (brj_taken_Dhl  === 1'b1) ? pc_mux_sel_Dhl
+    :                             pm_p;
 
   // Only send a valid imem request if not stalled
 
-  wire   imemreq_val_Phl = reset || !stall_Phl;
+  // We always request two instructions if not in reset.
+  wire   imemreq_val_Phl  = !reset;
   assign imemreq0_val     = imemreq_val_Phl;
   assign imemreq1_val     = imemreq_val_Phl;
 
@@ -151,15 +152,17 @@ module riscv_CoreCtrl
 
   wire inst_val_Fhl = ( !bubble_Fhl && !squash_Fhl );
 
-  // Squash instruction in F stage if branch taken for a valid
-  // instruction or if there was an exception in X stage
+  // We squash F and D if a jump resolves in D (PC selection)
+  // or a branch/jump resolves in X0.
+  // We use !bubble_Dhl instead of inst_val_Dhl to avoid a combinatorial feedback loop.
+  wire squash_Fhl = ( inst_val_X0hl && brj_taken_X0hl )
+                      || ( !bubble_Dhl && brj_taken_Dhl );
 
-  wire squash_Fhl
-    = ( inst_val_Dhl && brj_taken_Dhl )
-   || ( inst_val_X0hl && brj_taken_X0hl );
+  wire squash_Dhl = squash_Fhl;
 
   // Stall in F if D is stalled, EXCEPT when squash fires (let the PC redirect happen).
-  assign stall_Fhl = stall_Dhl && !squash_Fhl;
+  // Use strict binary comparison to prevent x-propagation.
+  assign stall_Fhl = (stall_Dhl === 1'b1) && !squash_Fhl;
 
   // Next bubble bit
 
@@ -230,27 +233,29 @@ module riscv_CoreCtrl
   always @ ( posedge clk ) begin
     if ( reset ) begin
       bubble_Dhl <= 1'b1;
+      ir0_Dhl    <= 32'b0;
+      ir1_Dhl    <= 32'b0;
     end
     else if( !stall_Dhl ) begin
       ir0_Dhl    <= imemresp0_queue_mux_out_Fhl;
       ir1_Dhl    <= imemresp1_queue_mux_out_Fhl;
       bubble_Dhl <= bubble_next_Fhl;
     end
-    // Inject invalid instruction into ir0_Dhl after it successfully issues.
-    else if( !active_stall_Dhl && steering_mux_sel_Dhl == 1'b0 ) begin
+    // Partial issue: ir0 issued, but ir1 stalled.
+    // D is stalled (to hold ir1), so we must NOP out ir0 so it doesn't re-issue.
+    else if( !stall_0_sb_Dhl && stall_1_hazard_Dhl ) begin
       ir0_Dhl <= 32'b0;
-      // Kill ir1 if ir0 was a jump (resolves in D) OR a taken branch fires from X0.
-      // Also mark D as bubble so the cleared instructions aren't treated as valid.
-      if ( cs0[`RISCV_INST_MSG_J_EN] || squash_Dhl ) begin
+      // If ir0 was a jump/branch that fired, we should also kill the stalled ir1.
+      if ( cs0_valid && (cs0[`RISCV_INST_MSG_J_EN] || squash_Dhl) ) begin
         ir1_Dhl    <= 32'b0;
         bubble_Dhl <= 1'b1;
       end
     end
-    // When squash fires and D was already stalled (steering flipped back to 0),
-    // clear ir0/ir1 explicitly so stale instructions don't propagate.
+    // Global squash (even if stalled)
     else if( squash_Dhl ) begin
       ir0_Dhl <= 32'b0;
       ir1_Dhl <= 32'b0;
+      bubble_Dhl <= 1'b1;
     end
   end
 
@@ -605,7 +610,7 @@ module riscv_CoreCtrl
   reg [31:0] sb_stage_3;  // True if instruction is currently in X3
   reg [31:0] sb_stage_4;  // True if instruction is currently in W
   reg [31:0] sb_is_load;  // True if instruction is a load
-  reg [31:0] sb_is_muldiv;// True if instruction uses the mul/div unit
+  reg [31:0] sb_is_muldiv; // True if instruction uses the mul/div unit
 
   // Scoreboard allocation signals from Decode stage
   wire sb_alloc_0 = ir0_valid_issue && inst0_wen_Dhl && (inst0_rd_Dhl != 5'd0);
@@ -625,12 +630,11 @@ module riscv_CoreCtrl
       sb_is_muldiv <= 32'b0;
     end else begin
       for (i = 0; i < 32; i = i + 1) begin
-        // Shift pipeline stages for valid instructions.
-        // If an instruction is squashed at a certain stage, we drop its pending status.
-        // Note: For simplicity, we just look at the pipeline registers' write enables
-        // to determine if an instruction has reached a stage or committed.
-
-        // Default: lose everything unless explicitly set or carried over below
+        // The scoreboard must always track the YOUNGEST producer of a register.
+        // We ensure this by checking from the oldest stage (W) to the youngest (Issue-1).
+        // Each successive check for architectural register 'i' will overwrite the previous ones if valid.
+        
+        // Default: not pending. If an instruction is in the pipeline, the logic below will set these to 1.
         sb_pending[i]   <= 1'b0;
         sb_pipeline[i]  <= 1'b0;
         sb_stage_0[i]   <= 1'b0;
@@ -638,83 +642,96 @@ module riscv_CoreCtrl
         sb_stage_2[i]   <= 1'b0;
         sb_stage_3[i]   <= 1'b0;
         sb_stage_4[i]   <= 1'b0;
-        sb_is_load[i]   <= sb_is_load[i];
-        sb_is_muldiv[i] <= sb_is_muldiv[i];
+        // sb_is_load and sb_is_muldiv are only valid when pending is true, no need to clear.
 
-        // 1. Shift existing valid instructions down the pipeline
-        // (Pipeline registers automatically handle stalls and squashes, so we just check what's valid in them!)
-        
-        // Pipeline A progression
+        // 1. Existing pipeline stages
+        if (inst_val_Whl && rf0_wen_Whl && (rf0_waddr_Whl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b0;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0;
+            sb_stage_4[i]   <= 1'b1;
+        end
+        if (inst_val_Whl && rf1_wen_Whl && (rf1_waddr_Whl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b1;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0;
+            sb_stage_4[i]   <= 1'b1;
+        end
+        if (inst_val_X3hl && rf0_wen_X3hl && (rf0_waddr_X3hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b0;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_3[i]   <= 1'b1;
+        end
+        if (inst_val_X3hl && rf1_wen_X3hl && (rf1_waddr_X3hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b1;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_3[i]   <= 1'b1;
+        end
+        if (inst_val_X2hl && rf0_wen_X2hl && (rf0_waddr_X2hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b0;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_2[i]   <= 1'b1;
+        end
+        if (inst_val_X2hl && rf1_wen_X2hl && (rf1_waddr_X2hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b1;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_2[i]   <= 1'b1;
+        end
+        if (inst_val_X1hl && rf0_wen_X1hl && (rf0_waddr_X1hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b0;
+            sb_stage_0[i]   <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_1[i]   <= 1'b1;
+            sb_is_load[i]   <= is_load_X1hl; // Inherit
+        end
+        if (inst_val_X1hl && rf1_wen_X1hl && (rf1_waddr_X1hl == i) && (i != 0)) begin
+            sb_pending[i]   <= 1'b1;
+            sb_pipeline[i]  <= 1'b1;
+            sb_stage_0[i]   <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
+            sb_stage_1[i]   <= 1'b1;
+        end
         if (inst_val_X0hl && rf0_wen_X0hl && (rf0_waddr_X0hl == i) && (i != 0)) begin
             sb_pending[i]   <= 1'b1;
             sb_pipeline[i]  <= 1'b0;
+            sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
             sb_stage_0[i]   <= 1'b1;
+            sb_is_load[i]   <= is_load_X0hl;
+            sb_is_muldiv[i] <= is_muldiv_X0hl;
         end
-        else if (inst_val_X1hl && rf0_wen_X1hl && (rf0_waddr_X1hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_1[i]   <= 1'b1;
-        end
-        else if (inst_val_X2hl && rf0_wen_X2hl && (rf0_waddr_X2hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_2[i]   <= 1'b1;
-        end
-        else if (inst_val_X3hl && rf0_wen_X3hl && (rf0_waddr_X3hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_3[i]   <= 1'b1;
-        end
-        else if (inst_val_Whl && rf0_wen_Whl && (rf0_waddr_Whl == i) && (i != 0)) begin
-            // Stage W means it's hitting the register file THIS cycle. Next cycle it will not be pending.
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_4[i]   <= 1'b1;
-        end
-        
-        // Pipeline B progression (Pipeline B only does simple ALU ops, so it only really exists in X0 and W)
-        // However, it physically flows through the registers anyway to stay in lockstep.
         if (inst_val_X0hl && rf1_wen_X0hl && (rf1_waddr_X0hl == i) && (i != 0)) begin
             sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1; // Pipeline B
+            sb_pipeline[i]  <= 1'b1;
+            sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
             sb_stage_0[i]   <= 1'b1;
-        end
-        else if (inst_val_X1hl && rf1_wen_X1hl && (rf1_waddr_X1hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_1[i]   <= 1'b1;
-        end
-        else if (inst_val_X2hl && rf1_wen_X2hl && (rf1_waddr_X2hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_2[i]   <= 1'b1;
-        end
-        else if (inst_val_X3hl && rf1_wen_X3hl && (rf1_waddr_X3hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_3[i]   <= 1'b1;
-        end
-        else if (inst_val_Whl && rf1_wen_Whl && (rf1_waddr_Whl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_4[i]   <= 1'b1;
+            sb_is_load[i]   <= 1'b0;   // Pipe B doesn't do loads
+            sb_is_muldiv[i] <= 1'b0;   // Pipe B doesn't do muldiv
         end
 
-        // 2. Allocate new instructions from Decode
-        // If an instruction is allocating THIS cycle (and D stage isn't stalled!), it overwrites the pipeline tracking.
-        // It starts its life conceptually 'entering' X0 on the next clock edge.
-        else if (sb_alloc_0 && !stall_Dhl && (inst0_rd_Dhl == i)) begin
+        // 2. Newly issued instructions (the YOUNGEST)
+        // These will reach X0 on the NEXT cycle.
+        if (sb_alloc_0 && !stall_Dhl && (inst0_rd_Dhl == i)) begin
             sb_pending[i]   <= 1'b1;
             sb_pipeline[i]  <= steer_inst0_to_B_Dhl ? 1'b1 : 1'b0;
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
             sb_is_load[i]   <= (cs0[`RISCV_INST_MSG_MEM_REQ] == ld);
             sb_is_muldiv[i] <= (cs0[`RISCV_INST_MSG_MULDIV_EN] == 1'b1);
         end
-        else if (sb_alloc_1 && !stall_Dhl && (inst1_rd_Dhl == i)) begin
+        if (sb_alloc_1 && !stall_Dhl && (inst1_rd_Dhl == i)) begin
             sb_pending[i]   <= 1'b1;
             sb_pipeline[i]  <= steer_inst0_to_B_Dhl ? 1'b0 : 1'b1; 
+            sb_stage_0[i]   <= 1'b0; sb_stage_1[i] <= 1'b0; sb_stage_2[i] <= 1'b0; sb_stage_3[i] <= 1'b0; sb_stage_4[i] <= 1'b0;
             sb_is_load[i]   <= (cs1[`RISCV_INST_MSG_MEM_REQ] == ld);
             sb_is_muldiv[i] <= (cs1[`RISCV_INST_MSG_MULDIV_EN] == 1'b1);
         end
+
+        // Special case: if no instruction in the entire pipeline is currently writing to 'i', 
+        // clear the pending bit. This handles squashes automatically because inst_val_X* will be 0.
+        // Wait, if it's already pending from the previous cycle, but not in any stage now (e.g. was in W last cycle),
+        // then the default must be 0? Yes, sb_pending is updated by the assignments above.
       end
     end
   end
@@ -762,20 +779,17 @@ module riscv_CoreCtrl
   // DISABLED until Pipeline B writeback is enabled (rfB_wen_Whl is currently tied to 0)
   wire steer_inst0_to_B_Dhl = inst0_is_alu_Dhl && !inst1_is_alu_Dhl && cs0_valid && cs1_valid;
 
-  // // Debugging part
-  // `ifndef SYNTHESIS
-  // always @(negedge clk) begin
-  //   if (inst_val_Dhl && cs0_valid && cs1_valid && !reset && ir1_Dhl != 0 && ir0_Dhl != 0) begin
-  //     $display("DEBUG STEER: ir0=%08x, ir1=%08x", ir0_Dhl, ir1_Dhl);
-  //     $display("  cs0_valid=%b, cs1_valid=%b", cs0_valid, cs1_valid);
-  //     $display("  cs0_muldiv=%b, cs0_br=%x, cs0_j=%b, cs0_mem=%x, cs0_csr=%b",
-  //         cs0[`RISCV_INST_MSG_MULDIV_EN], cs0[`RISCV_INST_MSG_BR_SEL], cs0[`RISCV_INST_MSG_J_EN], cs0[`RISCV_INST_MSG_MEM_REQ], cs0[`RISCV_INST_MSG_CSR_WEN]);
-  //     $display("  inst0_is_alu=%b, inst1_is_alu=%b, steer=%b", inst0_is_alu_Dhl, inst1_is_alu_Dhl, steer_inst0_to_B_Dhl);
-  //     $display("  raw_hazard=%b, rd0=%d, rs1=%d, rs2=%d, ir1_valid=%b", 
-  //         raw_hazard_Dhl, inst0_rd_Dhl, inst1_rs1_Dhl, inst1_rs2_Dhl, ir1_valid_issue);
-  //   end
-  // end
-  // `endif
+  // Debugging part
+  `ifndef SYNTHESIS
+  always @(negedge clk) begin
+    if (!reset && (ir0_valid_issue === 1'bx || ir1_valid_issue === 1'bx || (inst_val_Dhl && cs0_valid))) begin
+      $display("DEBUG D: cyc=%0d ir0=%h ir1=%h", $time/10, ir0_Dhl, ir1_Dhl);
+      $display("  val=%b cs0v=%b cs1v=%b steer=%b", inst_val_Dhl, cs0_valid, cs1_valid, steer_inst0_to_B_Dhl);
+      $display("  hazards: raw=%b waw=%b struct=%b sb0=%b sb1=%b", raw_hazard_Dhl, waw_hazard_Dhl, structural_hazard_Dhl, stall_0_sb_Dhl, stall_1_sb_Dhl);
+      $display("  issue: ir0_v=%b ir1_v=%b", ir0_valid_issue, ir1_valid_issue);
+    end
+  end
+  `endif
   
   // Scoreboard RAW Hazards
   // We query the scoreboard for Rs1 and Rs2 of each instruction.
@@ -811,8 +825,8 @@ module riscv_CoreCtrl
   // ir1 stalls if there is a RAW, WAW, or Structural Hazard (or if ir0 stalls because of scoreboard)
   wire stall_1_hazard_Dhl = waw_hazard_Dhl || raw_hazard_Dhl || structural_hazard_Dhl || stall_1_sb_Dhl || stall_0_sb_Dhl;
 
-  wire ir0_valid_issue = inst_val_Dhl && cs0_valid && !stall_0_sb_Dhl;
-  wire ir1_valid_issue = inst_val_Dhl && cs1_valid && !stall_1_hazard_Dhl;
+  assign ir0_valid_issue = (inst_val_Dhl === 1'b1) && cs0_valid && !stall_0_sb_Dhl;
+  assign ir1_valid_issue = (inst_val_Dhl === 1'b1) && cs1_valid && !stall_1_hazard_Dhl;
 
   assign instA_Dhl = (steer_inst0_to_B_Dhl) ? (ir1_valid_issue ? ir1_Dhl : 32'b0)
                                             : (ir0_valid_issue ? ir0_Dhl : 32'b0);
@@ -826,10 +840,11 @@ module riscv_CoreCtrl
   // Jump and Branch Controls
 
   // A jump or branch in the D stage is taken if EITHER validly issuing instruction is a jump.
-  wire ir0_is_jump_Dhl = ir0_valid_issue && cs0[`RISCV_INST_MSG_J_EN];
-  wire ir1_is_jump_Dhl = ir1_valid_issue && cs1[`RISCV_INST_MSG_J_EN];
-
-  wire       brj_taken_Dhl = ir0_is_jump_Dhl || ir1_is_jump_Dhl;
+  // Use raw validity (not including squash) to handle Jumps in D-stage 
+  // to avoid combinatorial feedback loops.
+  wire       ir0_is_jump_Dhl = ( cs0_valid && ( cs0[`RISCV_INST_MSG_J_EN] ) );
+  wire       ir1_is_jump_Dhl = ( cs1_valid && ( cs1[`RISCV_INST_MSG_J_EN] ) );
+  wire       brj_taken_Dhl   = ir0_is_jump_Dhl || ir1_is_jump_Dhl;
 
   // Since we only have one branch target Datapath input, we take it from the active jump/branch.
   // We prioritize ir0 over ir1 (if both were branches, the first taken one would kill the second anyway).
@@ -1034,7 +1049,7 @@ module riscv_CoreCtrl
 
   // Squash instruction in D if a valid branch in X is taken
 
-  wire squash_Dhl = ( inst_val_X0hl && brj_taken_X0hl );
+  // Squash logic moved to top of module to avoid circular dependencies
 
   // For Part 2 of this lab, replace the multdiv and ld stall logic with a scoreboard based stall logic
 
@@ -1130,11 +1145,11 @@ module riscv_CoreCtrl
   wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl || stall_0_sb_Dhl);
   wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
-  // In our superscalar implementation with independent fetch ports, we only need to freeze
-  // the entire D-stage if Instruction 0 is stalled. If Instruction 1 is stalled but 0 can issue,
-  // we issue 0, increment PC by 4, and the fetch stage will naturally re-fetch Instruction 1
-  // into the ir0 slot on the next cycle.
-  assign stall_Dhl = stall_0_Dhl;
+  // In our superscalar implementation, we freeze the entire D-stage if 
+  // EITHER instruction stalls. If Inst 0 issues but 1 stalls, we freeze D
+  // and NOP out ir0 in the next cycle (see D-input block). 
+  // Use strict binary comparison to prevent x-propagation.
+  assign stall_Dhl = (stall_0_Dhl === 1'b1) || (stall_1_hazard_Dhl === 1'b1);
 
   // Next bubble bit
   // The D stage injects a bubble into X0 if the active instruction is squash or stalled.
@@ -1179,7 +1194,12 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      bubble_X0hl <= 1'b1;
+      rf0_wen_X0hl        <= 1'b0;
+      rf1_wen_X0hl        <= 1'b0;
+      dmemreq_val_X0hl    <= 1'b0;
+      muldivreq_val_X0hl  <= 1'b0;
+      csr_wen_X0hl        <= 1'b0;
+      bubble_X0hl         <= 1'b1;
     end
     else if( !stall_X0hl ) begin
       ir0_X0hl              <= ir0_Dhl;
@@ -1229,7 +1249,7 @@ module riscv_CoreCtrl
 
   assign dmemreq_msg_rw  = dmemreq_msg_rw_X0hl;
   assign dmemreq_msg_len = dmemreq_msg_len_X0hl;
-  assign dmemreq_val     = ( inst_val_X0hl && !stall_X0hl && dmemreq_val_X0hl );
+  assign dmemreq_val     = ( inst_val_X0hl && !stall_X1hl && dmemreq_val_X0hl );
 
   // Resolve Branch
 
@@ -1322,9 +1342,12 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      dmemreq_val_X1hl <= 1'b0;
-
-      bubble_X1hl <= 1'b1;
+      dmemreq_val_X1hl      <= 1'b0;
+      rf0_wen_X1hl          <= 1'b0;
+      rf1_wen_X1hl          <= 1'b0;
+      csr_wen_X1hl          <= 1'b0;
+      dmemresp_queue_val_X1hl <= 1'b0;
+      bubble_X1hl           <= 1'b1;
     end
     else if( !stall_X1hl ) begin
       ir0_X1hl              <= ir0_X0hl;
@@ -1408,7 +1431,10 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      bubble_X2hl <= 1'b1;
+      rf0_wen_X2hl  <= 1'b0;
+      rf1_wen_X2hl  <= 1'b0;
+      csr_wen_X2hl  <= 1'b0;
+      bubble_X2hl   <= 1'b1;
     end
     else if( !stall_X2hl ) begin
       ir0_X2hl              <= ir0_X1hl;
@@ -1427,7 +1453,6 @@ module riscv_CoreCtrl
     end
     dmemresp_queue_val_X1hl <= dmemresp_queue_val_next_X1hl;
   end
-
   //----------------------------------------------------------------------
   // X2 Stage
   //----------------------------------------------------------------------
@@ -1473,7 +1498,10 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      bubble_X3hl <= 1'b1;
+      rf0_wen_X3hl  <= 1'b0;
+      rf1_wen_X3hl  <= 1'b0;
+      csr_wen_X3hl  <= 1'b0;
+      bubble_X3hl   <= 1'b1;
     end
     else if( !stall_X3hl ) begin
       ir0_X3hl              <= ir0_X2hl;
@@ -1536,7 +1564,10 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      bubble_Whl <= 1'b1;
+      rf0_wen_Whl  <= 1'b0;
+      rf1_wen_Whl  <= 1'b0;
+      csr_wen_Whl  <= 1'b0;
+      bubble_Whl   <= 1'b1;
     end
     else if( !stall_Whl ) begin
       ir0_Whl          <= ir0_X3hl;
