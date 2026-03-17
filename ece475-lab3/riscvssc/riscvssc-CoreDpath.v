@@ -240,14 +240,10 @@ module riscv_CoreDpath
   
   assign pcA_Dhl = 
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus4_Dhl :                             // ir1 to A
-    (ir0_valid_issue)              ? pc_Dhl :                                   // ir0 to A
-    (ir1_valid_issue)              ? pc_plus4_Dhl :                             // ir0 dead, ir1 to A
                                      pc_Dhl;                                    // Default
 
   assign pcA_plus4_Dhl =
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus8_Dhl :
-    (ir0_valid_issue)              ? pc_plus4_Dhl :
-    (ir1_valid_issue)              ? pc_plus8_Dhl :
                                      pc_plus4_Dhl;
 
   assign pcB_Dhl = 
@@ -258,11 +254,9 @@ module riscv_CoreDpath
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus4_Dhl :
                                      pc_plus8_Dhl;
 
-  // We also need to determine the ACTUAL next PC based on how many instructions issued.
-  // We feed this value directly out to `pc_mux_out_Phl` when no branches are taken.
-  // If ir1 stalled (or was invalid), we only issued 1 instruction, so PC+4.
-  // If both issued, we issued 2 instructions, so PC+8.
-  wire [31:0] next_pc_expected_Dhl = (ir1_valid_issue) ? pc_plus8_Dhl : pc_plus4_Dhl; 
+  wire [31:0] next_pc_expected_Dhl = pc_Dhl
+                                   + (ir0_valid_issue ? 32'd4 : 32'd0)
+                                   + (ir1_valid_issue ? 32'd4 : 32'd0);
 
   // pcA_Dhl is already steered to the PC of the issued instruction (instA_Dhl).
   assign branch_targ_Dhl = pcA_Dhl + instA_imm_sb_Dhl;
