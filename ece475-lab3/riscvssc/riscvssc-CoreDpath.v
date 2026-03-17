@@ -240,10 +240,14 @@ module riscv_CoreDpath
   
   assign pcA_Dhl = 
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus4_Dhl :                             // ir1 to A
+    (ir0_valid_issue)              ? pc_Dhl :                                   // ir0 to A
+    (ir1_valid_issue)              ? pc_plus4_Dhl :                             // ir0 dead, ir1 to A
                                      pc_Dhl;                                    // Default
 
   assign pcA_plus4_Dhl =
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus8_Dhl :
+    (ir0_valid_issue)              ? pc_plus4_Dhl :
+    (ir1_valid_issue)              ? pc_plus8_Dhl :
                                      pc_plus4_Dhl;
 
   assign pcB_Dhl = 
@@ -254,6 +258,8 @@ module riscv_CoreDpath
     (steering_mux_sel_Dhl == 1'b1) ? pc_plus4_Dhl :
                                      pc_plus8_Dhl;
 
+  // Compute next sequential PC based on how many instructions issued this cycle.
+  // ir0_valid_issue and ir1_valid_issue are driven from CoreCtrl and wired in.
   wire [31:0] next_pc_expected_Dhl = pc_Dhl
                                    + (ir0_valid_issue ? 32'd4 : 32'd0)
                                    + (ir1_valid_issue ? 32'd4 : 32'd0);
