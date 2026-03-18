@@ -28,7 +28,7 @@ module riscv_CoreDpath
 
   // Controls Signals (ctrl->dpath)
 
-  input   [1:0] pc_mux_sel_Phl,
+  input   [2:0] pc_mux_sel_Phl,
   input         steering_mux_sel_Dhl,
   input   [3:0] opA0_byp_mux_sel_Dhl,
   input   [1:0] opA0_mux_sel_Dhl,
@@ -89,6 +89,7 @@ module riscv_CoreDpath
   wire [31:0] branch_targ_Phl;
   wire [31:0] jump_targ_Phl;
   wire [31:0] jumpreg_targ_Phl;
+  wire [31:0] partial_targ_Phl;
   wire [31:0] pc_mux_out_Phl;
 
   wire [31:0] reset_vector = 32'h00080000;
@@ -99,12 +100,14 @@ module riscv_CoreDpath
   assign branch_targ_Phl      = branch_targ_X0hl;
   assign jump_targ_Phl        = jump_targ_Dhl;
   assign jumpreg_targ_Phl     = jumpreg_targ_Dhl;
+  assign partial_targ_Phl     = pc_Dhl + 32'd4;
 
   assign pc_mux_out_Phl
-    = ( pc_mux_sel_Phl == 2'd0 ) ? next_pc_expected_Phl
-    : ( pc_mux_sel_Phl == 2'd1 ) ? branch_targ_Phl
-    : ( pc_mux_sel_Phl == 2'd2 ) ? jump_targ_Phl
-    : ( pc_mux_sel_Phl == 2'd3 ) ? jumpreg_targ_Phl
+    = ( pc_mux_sel_Phl == 3'd0 ) ? next_pc_expected_Phl
+    : ( pc_mux_sel_Phl == 3'd1 ) ? branch_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd2 ) ? jump_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd3 ) ? jumpreg_targ_Phl
+    : ( pc_mux_sel_Phl == 3'd4 ) ? partial_targ_Phl
     :                              32'bx;
 
   // Send out imem request early

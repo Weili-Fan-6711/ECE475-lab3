@@ -65,7 +65,7 @@ module riscv_Core
   wire [31:0] dmemreq_msg_data;
   wire [31:0] dmemresp_msg_data;
 
-  wire  [1:0] pc_mux_sel_Phl;
+  wire  [2:0] pc_mux_sel_Phl;
   wire        steering_mux_sel_Dhl;
   wire  [3:0] opA0_byp_mux_sel_Dhl;
   wire  [1:0] opA0_mux_sel_Dhl;

@@ -34,7 +34,7 @@ module riscv_CoreCtrl
 
   // Controls Signals (ctrl->dpath)
 
-  output  [1:0] pc_mux_sel_Phl,
+  output  [2:0] pc_mux_sel_Phl,
   output        steering_mux_sel_Dhl,
   output  [3:0] opA0_byp_mux_sel_Dhl,
   output  [1:0] opA0_mux_sel_Dhl,
@@ -98,6 +98,7 @@ module riscv_CoreCtrl
   assign pc_mux_sel_Phl
     = (brj_taken_X0hl === 1'b1) ? pm_b
     : (brj_taken_Dhl  === 1'b1) ? pc_mux_sel_Dhl
+    : (partial_issue  === 1'b1) ? pm_partial
     :                             pm_p;
 
   // Only send a valid imem request if not stalled
@@ -152,13 +153,12 @@ module riscv_CoreCtrl
 
   wire inst_val_Fhl = ( !bubble_Fhl && !squash_Fhl );
 
-  // We squash F and D if a jump resolves in D (PC selection)
-  // or a branch/jump resolves in X0.
-  // We use !bubble_Dhl instead of inst_val_Dhl to avoid a combinatorial feedback loop.
-  wire squash_Fhl = ( inst_val_X0hl && brj_taken_X0hl )
-                      || ( inst_val_Dhl && brj_taken_Dhl );
+  wire squash_Dhl = ( inst_val_X0hl && brj_taken_X0hl )
+                      || ( !bubble_Dhl && brj_taken_Dhl );
 
-  wire squash_Dhl = squash_Fhl;
+  wire partial_issue = ir0_valid_issue && !ir1_valid_issue;
+  
+  wire squash_Fhl = squash_Dhl || partial_issue;
 
   // Stall in F if D is stalled, EXCEPT when squash fires (let the PC redirect happen).
   // Use strict binary comparison to prevent x-propagation.
@@ -241,16 +241,6 @@ module riscv_CoreCtrl
       ir1_Dhl    <= imemresp1_queue_mux_out_Fhl;
       bubble_Dhl <= bubble_next_Fhl;
     end
-    // Partial issue: ir0 issued but ir1 stalled.
-    // We freeze D (to hold ir1 for next cycle) and zero ir0 so it won't re-issue.
-    else if( !stall_0_Dhl && stall_1_hazard_Dhl && cs1_valid ) begin
-      ir0_Dhl <= 32'b0;  // NOP out ir0 — it already issued
-      // If that ir0 was a branch/jump that squashed, also kill ir1
-      if ( cs0_valid && (cs0[`RISCV_INST_MSG_J_EN] || squash_Dhl) ) begin
-        ir1_Dhl    <= 32'b0;
-        bubble_Dhl <= 1'b1;
-      end
-    end
     // Global squash (even if stalled)
     else if( squash_Dhl ) begin
       ir0_Dhl <= 32'b0;
@@ -286,11 +276,12 @@ module riscv_CoreCtrl
 
   // PC Mux Select
 
-  localparam pm_x   = 2'bx;  // Don't care
-  localparam pm_p   = 2'd0;  // Use pc+4
-  localparam pm_b   = 2'd1;  // Use branch address
-  localparam pm_j   = 2'd2;  // Use jump address
-  localparam pm_r   = 2'd3;  // Use jump register
+  localparam pm_x   = 3'bx;  // Don't care
+  localparam pm_p   = 3'd0;  // Use pc+4
+  localparam pm_b   = 3'd1;  // Use branch address
+  localparam pm_j   = 3'd2;  // Use jump address
+  localparam pm_r   = 3'd3;  // Use jump register
+  localparam pm_partial = 3'd4; // Use pc_Dhl + 4
 
   // Operand 0 Bypass Mux Select
 
@@ -467,7 +458,7 @@ module riscv_CoreCtrl
 
   // Instruction Decode
 
-  localparam cs_sz = 39;
+  localparam cs_sz = 40;
   reg [cs_sz-1:0] cs0;
   reg [cs_sz-1:0] cs1;
 
@@ -740,7 +731,6 @@ module riscv_CoreCtrl
   // `ifndef SYNTHESIS
   // always @(negedge clk) begin
   //   if (!reset && (ir0_valid_issue === 1'bx || ir1_valid_issue === 1'bx || (inst_val_Dhl && cs0_valid))) begin
-  //     $display("DEBUG D: cyc=%0d ir0=%h ir1=%h", $time/10, ir0_Dhl, ir1_Dhl);
   //     $display("  val=%b cs0v=%b cs1v=%b steer=%b", inst_val_Dhl, cs0_valid, cs1_valid, steer_inst0_to_B_Dhl);
   //     $display("  hazards: raw=%b waw=%b struct=%b sb0=%b sb1=%b", raw_hazard_Dhl, waw_hazard_Dhl, structural_hazard_Dhl, stall_0_sb_Dhl, stall_1_sb_Dhl);
   //     $display("  issue: ir0_v=%b ir1_v=%b", ir0_valid_issue, ir1_valid_issue);
@@ -867,11 +857,8 @@ module riscv_CoreCtrl
   // Drive outputs for Pipeline B operand and ALU execution
   wire rf1_wen_out_Whl        = ( inst_val_Whl && !stall_Whl && rf1_wen_Whl );
   assign rfB_wen_Whl          = rf1_wen_out_Whl;
-  // always @(negedge clk) begin
-  //   if (inst_val_Dhl) $display("DEBUG D: ir0=%x ir1=%x steer=%b ir0_v=%b ir1_v=%b rf0_wen=%b rf1_wen=%b", ir0_Dhl, ir1_Dhl, steer_inst0_to_B_Dhl, ir0_valid_issue, ir1_valid_issue, rf0_wen_Dhl, rf1_wen_Dhl);
-  //   if (rf0_wen_out_Whl) $display("DEBUG W: cyc=%0d rfA_wen_Whl=1 waddr=%d", $time/10, rfA_waddr_Whl);
-  //   if (rf1_wen_out_Whl) $display("DEBUG W: cyc=%0d rfB_wen_Whl=1 waddr=%d", $time/10, rfB_waddr_Whl);
-  // end
+  always @(negedge clk) begin
+  end
   assign rfB_waddr_Whl        = rf1_waddr_Whl;
   assign aluB_fn_X0hl         = alu1_fn_X0hl;
   assign opB0_mux_sel_Dhl     = op10_mux_sel_Dhl;
@@ -1110,7 +1097,7 @@ module riscv_CoreCtrl
   // When ir1 stalls but ir0 issues, D stays frozen and we NOP out ir0 above.
   // Use stall_1_hazard_Dhl (not stall_1_Dhl) because it's correctly gated by cs1_valid
   // and won't false-stall when ir1_Dhl is a NOP (after being zeroed).
-  assign stall_Dhl = (stall_0_Dhl === 1'b1) || (stall_1_hazard_Dhl === 1'b1 && cs1_valid);
+  assign stall_Dhl = (stall_0_Dhl === 1'b1);
 
   // Next bubble bit
   // The D stage injects a bubble into X0 if the active instruction is squash or stalled.

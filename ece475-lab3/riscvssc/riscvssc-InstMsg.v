@@ -156,11 +156,11 @@
 // Control bundle
 //------------------------------------------------------------------------
 
-`define RISCV_INST_MSG_CS_SZ      39
-`define RISCV_INST_MSG_INST_VAL   38:38
-`define RISCV_INST_MSG_J_EN       37:37
-`define RISCV_INST_MSG_BR_SEL     36:34
-`define RISCV_INST_MSG_PC_SEL     33:32
+`define RISCV_INST_MSG_CS_SZ      40
+`define RISCV_INST_MSG_INST_VAL   39:39
+`define RISCV_INST_MSG_J_EN       38:38
+`define RISCV_INST_MSG_BR_SEL     37:35
+`define RISCV_INST_MSG_PC_SEL     34:32
 `define RISCV_INST_MSG_OP0_SEL    31:30
 `define RISCV_INST_MSG_RS1_EN     29:29
 `define RISCV_INST_MSG_OP1_SEL    28:26
