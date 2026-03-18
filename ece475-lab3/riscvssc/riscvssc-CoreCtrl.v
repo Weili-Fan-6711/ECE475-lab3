@@ -601,6 +601,9 @@ module riscv_CoreCtrl
   // Scoreboard Structure
   //----------------------------------------------------------------------
 
+  // Scoreboard Structure (Combinational)
+  // ----------------------------------------------------------------------
+
   // 32 architectural registers
   reg [31:0] sb_pending;
   reg [31:0] sb_pipeline; // 0 for Pipeline A, 1 for Pipeline B
@@ -612,122 +615,77 @@ module riscv_CoreCtrl
   reg [31:0] sb_is_load;  // True if instruction is a load
   reg [31:0] sb_is_muldiv; // True if instruction uses the mul/div unit
 
-  // Scoreboard allocation signals from Decode stage
-  wire sb_alloc_0 = ir0_valid_issue && inst0_wen_Dhl && (inst0_rd_Dhl != 5'd0);
-  wire sb_alloc_1 = ir1_valid_issue && inst1_wen_Dhl && (inst1_rd_Dhl != 5'd0);
-
   integer i;
-  always @(posedge clk) begin
-    if (reset) begin
-      sb_pending   <= 32'b0;
-      sb_pipeline  <= 32'b0;
-      sb_stage_0   <= 32'b0;
-      sb_stage_1   <= 32'b0;
-      sb_stage_2   <= 32'b0;
-      sb_stage_3   <= 32'b0;
-      sb_stage_4   <= 32'b0;
-      sb_is_load   <= 32'b0;
-      sb_is_muldiv <= 32'b0;
-    end else begin
-      for (i = 0; i < 32; i = i + 1) begin
-        // The scoreboard must always track the YOUNGEST producer of a register.
-        // We ensure this by checking from the oldest stage (W) to the youngest (Issue-1).
-        // Each successive check for architectural register 'i' will overwrite the previous ones if valid.
-        
-        // Default: not pending.
-        sb_pending[i]   <= 1'b0;
-        sb_pipeline[i]  <= 1'b0;
-        sb_stage_0[i]   <= 1'b0;
-        sb_stage_1[i]   <= 1'b0;
-        sb_stage_2[i]   <= 1'b0;
-        sb_stage_3[i]   <= 1'b0;
-        sb_stage_4[i]   <= 1'b0;
-        sb_is_load[i]   <= 1'b0;
-        sb_is_muldiv[i] <= 1'b0;
+  always @(*) begin
+    for (i = 0; i < 32; i = i + 1) begin
+      sb_pending[i]   = 1'b0;
+      sb_pipeline[i]  = 1'b0;
+      sb_stage_0[i]   = 1'b0;
+      sb_stage_1[i]   = 1'b0;
+      sb_stage_2[i]   = 1'b0;
+      sb_stage_3[i]   = 1'b0;
+      sb_stage_4[i]   = 1'b0;
+      sb_is_load[i]   = 1'b0;
+      sb_is_muldiv[i] = 1'b0;
 
-        // 1. Existing pipeline stages
-        if (inst_val_Whl && rf0_wen_Whl && (rf0_waddr_Whl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_4[i]   <= 1'b1;
-            sb_is_load[i]   <= 1'b0; // Metadata irrelevant in W, but clear it
-            sb_is_muldiv[i] <= 1'b0;
-        end
-        if (inst_val_Whl && rf1_wen_Whl && (rf1_waddr_Whl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_4[i]   <= 1'b1;
-        end
-        if (inst_val_X3hl && rf0_wen_X3hl && (rf0_waddr_X3hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_3[i]   <= 1'b1;
-            sb_is_load[i]   <= is_load_X3hl;
-            sb_is_muldiv[i] <= is_muldiv_X3hl;
-        end
-        if (inst_val_X3hl && rf1_wen_X3hl && (rf1_waddr_X3hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_3[i]   <= 1'b1;
-        end
-        if (inst_val_X2hl && rf0_wen_X2hl && (rf0_waddr_X2hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_2[i]   <= 1'b1;
-            sb_is_load[i]   <= is_load_X2hl;
-            sb_is_muldiv[i] <= is_muldiv_X2hl;
-        end
-        if (inst_val_X2hl && rf1_wen_X2hl && (rf1_waddr_X2hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_2[i]   <= 1'b1;
-        end
-        if (inst_val_X1hl && rf0_wen_X1hl && (rf0_waddr_X1hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_1[i]   <= 1'b1;
-            sb_is_load[i]   <= is_load_X1hl;
-            sb_is_muldiv[i] <= is_muldiv_X1hl;
-        end
-        if (inst_val_X1hl && rf1_wen_X1hl && (rf1_waddr_X1hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_1[i]   <= 1'b1;
-        end
-        if (inst_val_X0hl && rf0_wen_X0hl && (rf0_waddr_X0hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b0;
-            sb_stage_0[i]   <= 1'b1;
-            sb_is_load[i]   <= is_load_X0hl;
-            sb_is_muldiv[i] <= is_muldiv_X0hl;
-        end
-        if (inst_val_X0hl && rf1_wen_X0hl && (rf1_waddr_X0hl == i) && (i != 0)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= 1'b1;
-            sb_stage_0[i]   <= 1'b1;
-            // sb_is_load/muldiv default to 0 for Pipe B
-        end
-
-        // 2. Newly issued instructions (the YOUNGEST)
-        if (sb_alloc_0 && !stall_0_Dhl && (inst0_rd_Dhl == i)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= steer_inst0_to_B_Dhl;
-            sb_stage_0[i]   <= 1'b0; // Reaching X0 next cycle
-            sb_is_load[i]   <= (cs0[`RISCV_INST_MSG_MEM_REQ] == ld);
-            sb_is_muldiv[i] <= (cs0[`RISCV_INST_MSG_MULDIV_EN] == 1'b1);
-        end
-        if (sb_alloc_1 && !stall_1_hazard_Dhl && (inst1_rd_Dhl == i)) begin
-            sb_pending[i]   <= 1'b1;
-            sb_pipeline[i]  <= !steer_inst0_to_B_Dhl; 
-            sb_stage_0[i]   <= 1'b0;
-            sb_is_load[i]   <= (cs1[`RISCV_INST_MSG_MEM_REQ] == ld);
-            sb_is_muldiv[i] <= (cs1[`RISCV_INST_MSG_MULDIV_EN] == 1'b1);
-        end
-
-        // Special case: if no instruction in the entire pipeline is currently writing to 'i', 
-        // clear the pending bit. This handles squashes automatically because inst_val_X* will be 0.
-        // Wait, if it's already pending from the previous cycle, but not in any stage now (e.g. was in W last cycle),
-        // then the default must be 0? Yes, sb_pending is updated by the assignments above.
+      // Check from oldest to youngest (W -> X3 -> X2 -> X1 -> X0)
+      if (inst_val_Whl && rf0_wen_Whl && (rf0_waddr_Whl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b0;
+          sb_stage_4[i]   = 1'b1;
+      end
+      if (inst_val_Whl && rf1_wen_Whl && (rf1_waddr_Whl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b1;
+          sb_stage_4[i]   = 1'b1;
+      end
+      if (inst_val_X3hl && rf0_wen_X3hl && (rf0_waddr_X3hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b0;
+          sb_stage_3[i]   = 1'b1;
+          sb_is_load[i]   = is_load_X3hl;
+          sb_is_muldiv[i] = is_muldiv_X3hl;
+      end
+      if (inst_val_X3hl && rf1_wen_X3hl && (rf1_waddr_X3hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b1;
+          sb_stage_3[i]   = 1'b1;
+      end
+      if (inst_val_X2hl && rf0_wen_X2hl && (rf0_waddr_X2hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b0;
+          sb_stage_2[i]   = 1'b1;
+          sb_is_load[i]   = is_load_X2hl;
+          sb_is_muldiv[i] = is_muldiv_X2hl;
+      end
+      if (inst_val_X2hl && rf1_wen_X2hl && (rf1_waddr_X2hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b1;
+          sb_stage_2[i]   = 1'b1;
+      end
+      if (inst_val_X1hl && rf0_wen_X1hl && (rf0_waddr_X1hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b0;
+          sb_stage_1[i]   = 1'b1;
+          sb_is_load[i]   = is_load_X1hl;
+          sb_is_muldiv[i] = is_muldiv_X1hl;
+      end
+      if (inst_val_X1hl && rf1_wen_X1hl && (rf1_waddr_X1hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b1;
+          sb_stage_1[i]   = 1'b1;
+      end
+      if (inst_val_X0hl && rf0_wen_X0hl && (rf0_waddr_X0hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b0;
+          sb_stage_0[i]   = 1'b1;
+          sb_is_load[i]   = is_load_X0hl;
+          sb_is_muldiv[i] = is_muldiv_X0hl;
+      end
+      if (inst_val_X0hl && rf1_wen_X0hl && (rf1_waddr_X0hl == i) && (i != 0)) begin
+          sb_pending[i]   = 1'b1;
+          sb_pipeline[i]  = 1'b1;
+          sb_stage_0[i]   = 1'b1;
       end
     end
   end
@@ -774,8 +732,9 @@ module riscv_CoreCtrl
 
   // Steering Logic Table
   // Steers ir0 to B and ir1 to A ONLY if ir0 is ALU and ir1 is Non-ALU. Otherwise ir0 goes A, ir1 goes B.
-  // DISABLED until Pipeline B writeback is enabled (rfB_wen_Whl is currently tied to 0)
-  wire steer_inst0_to_B_Dhl = inst0_is_alu_Dhl && !inst1_is_alu_Dhl && cs0_valid && cs1_valid;
+  // ALSO steers ir1 to A if ir0 is invalid (e.g. after a partial issue).
+  wire steer_inst0_to_B_Dhl = (inst0_is_alu_Dhl && !inst1_is_alu_Dhl && cs0_valid && cs1_valid)
+                           || (!cs0_valid && cs1_valid);
 
   // // Debugging part
   // `ifndef SYNTHESIS
@@ -861,8 +820,8 @@ module riscv_CoreCtrl
   wire [4:0] rs10_addr_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? inst0_rs1_Dhl : inst1_rs1_Dhl;
   wire [4:0] rs20_addr_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? inst0_rs2_Dhl : inst1_rs2_Dhl;
 
-  wire [4:0] rs11_addr_Dhl  = inst1_rs1_Dhl;
-  wire [4:0] rs21_addr_Dhl  = inst1_rs2_Dhl;
+  wire [4:0] rs11_addr_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? inst1_rs1_Dhl : inst0_rs1_Dhl;
+  wire [4:0] rs21_addr_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? inst1_rs2_Dhl : inst0_rs2_Dhl;
 
   wire       rs10_en_Dhl    = (steering_mux_sel_Dhl == 1'b0) ? (cs0_valid && cs0[`RISCV_INST_MSG_RS1_EN]) : (cs1_valid && cs1[`RISCV_INST_MSG_RS1_EN]);
   wire       rs20_en_Dhl    = (steering_mux_sel_Dhl == 1'b0) ? (cs0_valid && cs0[`RISCV_INST_MSG_RS2_EN]) : (cs1_valid && cs1[`RISCV_INST_MSG_RS2_EN]);
@@ -908,6 +867,11 @@ module riscv_CoreCtrl
   // Drive outputs for Pipeline B operand and ALU execution
   wire rf1_wen_out_Whl        = ( inst_val_Whl && !stall_Whl && rf1_wen_Whl );
   assign rfB_wen_Whl          = rf1_wen_out_Whl;
+  // always @(negedge clk) begin
+  //   if (inst_val_Dhl) $display("DEBUG D: ir0=%x ir1=%x steer=%b ir0_v=%b ir1_v=%b rf0_wen=%b rf1_wen=%b", ir0_Dhl, ir1_Dhl, steer_inst0_to_B_Dhl, ir0_valid_issue, ir1_valid_issue, rf0_wen_Dhl, rf1_wen_Dhl);
+  //   if (rf0_wen_out_Whl) $display("DEBUG W: cyc=%0d rfA_wen_Whl=1 waddr=%d", $time/10, rfA_waddr_Whl);
+  //   if (rf1_wen_out_Whl) $display("DEBUG W: cyc=%0d rfB_wen_Whl=1 waddr=%d", $time/10, rfB_waddr_Whl);
+  // end
   assign rfB_waddr_Whl        = rf1_waddr_Whl;
   assign aluB_fn_X0hl         = alu1_fn_X0hl;
   assign opB0_mux_sel_Dhl     = op10_mux_sel_Dhl;

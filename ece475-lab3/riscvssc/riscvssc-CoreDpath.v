@@ -95,7 +95,7 @@ module riscv_CoreDpath
 
   // Pull mux inputs from later stages
 
-  assign next_pc_expected_Phl = next_pc_expected_Dhl;
+  assign next_pc_expected_Phl = pc_plus8_Fhl;
   assign branch_targ_Phl      = branch_targ_X0hl;
   assign jump_targ_Phl        = jump_targ_Dhl;
   assign jumpreg_targ_Phl     = jumpreg_targ_Dhl;
