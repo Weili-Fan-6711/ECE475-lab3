@@ -100,7 +100,6 @@ module riscv_CoreDpath
   assign branch_targ_Phl      = branch_targ_X0hl;
   assign jump_targ_Phl        = jump_targ_Dhl;
   assign jumpreg_targ_Phl     = jumpreg_targ_Dhl;
-  assign partial_targ_Phl     = pc_Dhl + 32'd4;
 
   assign pc_mux_out_Phl
     = ( pc_mux_sel_Phl == 3'd0 ) ? next_pc_expected_Phl
@@ -266,6 +265,8 @@ module riscv_CoreDpath
   wire [31:0] next_pc_expected_Dhl = pc_Dhl
                                    + (ir0_valid_issue ? 32'd4 : 32'd0)
                                    + (ir1_valid_issue ? 32'd4 : 32'd0);
+
+  assign partial_targ_Phl     = next_pc_expected_Dhl;
 
   // pcA_Dhl is already steered to the PC of the issued instruction (instA_Dhl).
   assign branch_targ_Dhl = pcA_Dhl + instA_imm_sb_Dhl;

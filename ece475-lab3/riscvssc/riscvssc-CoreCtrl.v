@@ -156,7 +156,7 @@ module riscv_CoreCtrl
   wire squash_Dhl = ( inst_val_X0hl && brj_taken_X0hl )
                       || ( !bubble_Dhl && brj_taken_Dhl );
 
-  wire partial_issue = ir0_valid_issue && !ir1_valid_issue;
+  wire partial_issue = ir0_valid_issue ^ ir1_valid_issue;
   
   wire squash_Fhl = squash_Dhl || partial_issue;
 
@@ -175,11 +175,15 @@ module riscv_CoreCtrl
   // Queue for instruction memory response
   //----------------------------------------------------------------------
 
-  wire imemresp0_queue_en_Fhl = ( stall_Dhl && imemresp0_val );
+  // Hold the first fetched pair while D is stalled; do not overwrite it
+  // with later responses before the queued pair is consumed.
+  wire imemresp0_queue_en_Fhl
+    = ( stall_Dhl && imemresp0_val && !imemresp0_queue_val_Fhl );
   wire imemresp0_queue_val_next_Fhl
     = stall_Dhl && ( imemresp0_val || imemresp0_queue_val_Fhl );
 
-  wire imemresp1_queue_en_Fhl = ( stall_Dhl && imemresp1_val );
+  wire imemresp1_queue_en_Fhl
+    = ( stall_Dhl && imemresp1_val && !imemresp1_queue_val_Fhl );
   wire imemresp1_queue_val_next_Fhl
     = stall_Dhl && ( imemresp1_val || imemresp1_queue_val_Fhl );
 
@@ -723,9 +727,7 @@ module riscv_CoreCtrl
 
   // Steering Logic Table
   // Steers ir0 to B and ir1 to A ONLY if ir0 is ALU and ir1 is Non-ALU. Otherwise ir0 goes A, ir1 goes B.
-  // ALSO steers ir1 to A if ir0 is invalid (e.g. after a partial issue).
-  wire steer_inst0_to_B_Dhl = (inst0_is_alu_Dhl && !inst1_is_alu_Dhl && cs0_valid && cs1_valid)
-                           || (!cs0_valid && cs1_valid);
+  wire steer_inst0_to_B_Dhl = (inst0_is_alu_Dhl && !inst1_is_alu_Dhl && cs0_valid && cs1_valid);
 
   // // Debugging part
   // `ifndef SYNTHESIS
@@ -771,9 +773,10 @@ module riscv_CoreCtrl
 
   // ir1 stalls if there is a RAW, WAW, or Structural Hazard (or if ir0 stalls because of scoreboard)
   wire stall_1_hazard_Dhl = cs1_valid && (waw_hazard_Dhl || raw_hazard_Dhl || structural_hazard_Dhl || stall_1_sb_Dhl || stall_0_sb_Dhl);
+  wire issue_en_Dhl       = inst_val_Dhl && !stall_Dhl && !squash_Dhl;
 
-  assign ir0_valid_issue = (inst_val_Dhl === 1'b1) && cs0_valid && !stall_0_sb_Dhl;
-  assign ir1_valid_issue = (inst_val_Dhl === 1'b1) && cs1_valid && !stall_1_hazard_Dhl;
+  assign ir0_valid_issue = issue_en_Dhl && cs0_valid && !stall_0_sb_Dhl;
+  assign ir1_valid_issue = issue_en_Dhl && cs1_valid && !stall_1_hazard_Dhl;
 
   assign instA_Dhl = (steer_inst0_to_B_Dhl) ? (ir1_valid_issue ? ir1_Dhl : 32'b0)
                                             : (ir0_valid_issue ? ir0_Dhl : 32'b0);
@@ -857,8 +860,11 @@ module riscv_CoreCtrl
   // Drive outputs for Pipeline B operand and ALU execution
   wire rf1_wen_out_Whl        = ( inst_val_Whl && !stall_Whl && rf1_wen_Whl );
   assign rfB_wen_Whl          = rf1_wen_out_Whl;
-  always @(negedge clk) begin
-  end
+  // always @(negedge clk) begin
+  //   if (inst_val_Dhl) $display("DEBUG D: ir0=%x ir1=%x steer=%b ir0_v=%b ir1_v=%b rf0_wen=%b rf1_wen=%b", ir0_Dhl, ir1_Dhl, steer_inst0_to_B_Dhl, ir0_valid_issue, ir1_valid_issue, rf0_wen_Dhl, rf1_wen_Dhl);
+  //   if (rf0_wen_out_Whl) $display("DEBUG W: cyc=%0d rfA_wen_Whl=1 waddr=%d", $time/10, rfA_waddr_Whl);
+  //   if (rf1_wen_out_Whl) $display("DEBUG W: cyc=%0d rfB_wen_Whl=1 waddr=%d", $time/10, rfB_waddr_Whl);
+  // end
   assign rfB_waddr_Whl        = rf1_waddr_Whl;
   assign aluB_fn_X0hl         = alu1_fn_X0hl;
   assign opB0_mux_sel_Dhl     = op10_mux_sel_Dhl;
@@ -1197,7 +1203,7 @@ module riscv_CoreCtrl
 
   assign dmemreq_msg_rw  = dmemreq_msg_rw_X0hl;
   assign dmemreq_msg_len = dmemreq_msg_len_X0hl;
-  assign dmemreq_val     = ( inst_val_X0hl && !stall_X1hl && dmemreq_val_X0hl );
+  assign dmemreq_val     = ( inst_val_X0hl && !stall_X0hl && dmemreq_val_X0hl );
 
   // Resolve Branch
 
