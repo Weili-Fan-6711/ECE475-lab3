@@ -153,12 +153,13 @@ module riscv_CoreCtrl
 
   wire inst_val_Fhl = ( !bubble_Fhl && !squash_Fhl );
 
-  wire squash_Dhl = ( inst_val_X0hl && brj_taken_X0hl )
-                      || ( !bubble_Dhl && brj_taken_Dhl );
+  // X0-stage branches/jumps squash the current D contents. D-stage jumps
+  // only redirect the fetch stage; they must still execute themselves.
+  wire squash_Dhl = ( inst_val_X0hl && brj_taken_X0hl );
 
   wire partial_issue = ir0_valid_issue ^ ir1_valid_issue;
   
-  wire squash_Fhl = squash_Dhl || partial_issue;
+  wire squash_Fhl = squash_Dhl || ( !bubble_Dhl && brj_taken_Dhl ) || partial_issue;
 
   // Stall in F if D is stalled, EXCEPT when squash fires (let the PC redirect happen).
   // Use strict binary comparison to prevent x-propagation.
@@ -405,6 +406,7 @@ module riscv_CoreCtrl
   // Is the current stage valid?
 
   wire inst_val_Dhl = ( !bubble_Dhl && !squash_Dhl );
+  wire inst_val_raw_Dhl = !bubble_Dhl;
 
   // Parse instruction fields
 
@@ -690,14 +692,14 @@ module riscv_CoreCtrl
   wire cs1_valid = (cs1[`RISCV_INST_MSG_INST_VAL] === 1'b1);
 
   // Instruction Categorization (ALU vs NON-ALU)
-  wire inst0_is_alu_Dhl = inst_val_Dhl && cs0_valid
+  wire inst0_is_alu_Dhl = inst_val_raw_Dhl && cs0_valid
                        && (cs0[`RISCV_INST_MSG_MULDIV_EN] == 1'b0)
                        && (cs0[`RISCV_INST_MSG_BR_SEL] == br_none)
                        && (cs0[`RISCV_INST_MSG_J_EN] == 1'b0)
                        && (cs0[`RISCV_INST_MSG_MEM_REQ] == nr)
                        && (cs0[`RISCV_INST_MSG_CSR_WEN] == 1'b0);
 
-  wire inst1_is_alu_Dhl = inst_val_Dhl && cs1_valid
+  wire inst1_is_alu_Dhl = inst_val_raw_Dhl && cs1_valid
                        && (cs1[`RISCV_INST_MSG_MULDIV_EN] == 1'b0)
                        && (cs1[`RISCV_INST_MSG_BR_SEL] == br_none)
                        && (cs1[`RISCV_INST_MSG_J_EN] == 1'b0)
@@ -710,7 +712,7 @@ module riscv_CoreCtrl
   wire inst1_wen_Dhl = cs1_valid && cs1[`RISCV_INST_MSG_RF_WEN];
 
   // WAW Hazard Detection (Intra-pair)
-  wire waw_hazard_Dhl = inst_val_Dhl && cs0_valid && cs1_valid && inst0_wen_Dhl && inst1_wen_Dhl 
+  wire waw_hazard_Dhl = inst_val_raw_Dhl && cs0_valid && cs1_valid && inst0_wen_Dhl && inst1_wen_Dhl 
                      && (inst0_rd_Dhl == inst1_rd_Dhl) && (inst0_rd_Dhl != 5'd0);
 
   // RAW Hazard Detection (Intra-pair)
@@ -718,12 +720,12 @@ module riscv_CoreCtrl
   wire inst1_rs2_en_Dhl = cs1_valid && cs1[`RISCV_INST_MSG_RS2_EN];
   // In our superscalar implementation, a stage is valid if it's not a bubble.
   // We consume physical slots (4 bytes each) even if they contain NOPs.
-  wire raw_hazard_Dhl   = inst_val_Dhl && cs0_valid && cs1_valid && inst0_wen_Dhl && (inst0_rd_Dhl != 5'd0)
+  wire raw_hazard_Dhl   = inst_val_raw_Dhl && cs0_valid && cs1_valid && inst0_wen_Dhl && (inst0_rd_Dhl != 5'd0)
                        && ( (inst1_rs1_en_Dhl && (inst1_rs1_Dhl == inst0_rd_Dhl))
                          || (inst1_rs2_en_Dhl && (inst1_rs2_Dhl == inst0_rd_Dhl)) );
 
   // Structural Hazard Detection
-  wire structural_hazard_Dhl = inst_val_Dhl && cs0_valid && cs1_valid && !inst0_is_alu_Dhl && !inst1_is_alu_Dhl;
+  wire structural_hazard_Dhl = inst_val_raw_Dhl && cs0_valid && cs1_valid && !inst0_is_alu_Dhl && !inst1_is_alu_Dhl;
 
   // Steering Logic Table
   // Steers ir0 to B and ir1 to A ONLY if ir0 is ALU and ir1 is Non-ALU. Otherwise ir0 goes A, ir1 goes B.
@@ -773,10 +775,12 @@ module riscv_CoreCtrl
 
   // ir1 stalls if there is a RAW, WAW, or Structural Hazard (or if ir0 stalls because of scoreboard)
   wire stall_1_hazard_Dhl = cs1_valid && (waw_hazard_Dhl || raw_hazard_Dhl || structural_hazard_Dhl || stall_1_sb_Dhl || stall_0_sb_Dhl);
-  wire issue_en_Dhl       = inst_val_Dhl && !stall_Dhl && !squash_Dhl;
 
-  assign ir0_valid_issue = issue_en_Dhl && cs0_valid && !stall_0_sb_Dhl;
-  assign ir1_valid_issue = issue_en_Dhl && cs1_valid && !stall_1_hazard_Dhl;
+  assign ir0_valid_issue = (inst_val_raw_Dhl === 1'b1) && cs0_valid && !stall_0_sb_Dhl;
+  // A D-stage jump in inst0 redirects control immediately, so inst1 must not issue
+  // from the same fetch pair or it will behave like a delay-slot instruction.
+  assign ir1_valid_issue = (inst_val_raw_Dhl === 1'b1) && cs1_valid && !stall_1_hazard_Dhl
+                           && !(ir0_is_jump_Dhl && ir0_valid_issue);
 
   assign instA_Dhl = (steer_inst0_to_B_Dhl) ? (ir1_valid_issue ? ir1_Dhl : 32'b0)
                                             : (ir0_valid_issue ? ir0_Dhl : 32'b0);
