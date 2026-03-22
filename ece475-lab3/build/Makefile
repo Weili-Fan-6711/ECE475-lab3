@@ -78,6 +78,7 @@ tests = \
   riscv-lh.vmh \
   riscv-lhu.vmh \
   riscv-mul.vmh \
+  riscv-mulpair.vmh \
   riscv-or.vmh \
   riscv-rem.vmh \
   riscv-remu.vmh \
@@ -96,6 +97,8 @@ tests = \
   riscv-sub.vmh \
   riscv-xor.vmh \
   riscv-xori.vmh \
+  riscv-structural.vmh \
+  riscv-waw.vmh \
 
 riscvstall_rtl_sim = riscvstall-sim
 riscvstall_rtl_rand_sim = riscvstall-randdelay-sim
