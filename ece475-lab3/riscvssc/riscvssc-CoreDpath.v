@@ -96,7 +96,7 @@ module riscv_CoreDpath
 
   // Pull mux inputs from later stages
 
-  assign next_pc_expected_Phl = pc_plus8_Fhl;
+  assign next_pc_expected_Phl = pc_plus4_Fhl;
   assign branch_targ_Phl      = branch_targ_X0hl;
   assign jump_targ_Phl        = jump_targ_Dhl;
   assign jumpreg_targ_Phl     = jumpreg_targ_Dhl;
@@ -116,7 +116,7 @@ module riscv_CoreDpath
     :             pc_mux_out_Phl;
   assign imemreq1_msg_addr
     = ( reset ) ? reset_vector + 32'd4
-    :             pc_mux_out_Phl + 32'd4;
+    :             32'b0;
 
   //----------------------------------------------------------------------
   // F <- P
@@ -423,6 +423,10 @@ module riscv_CoreDpath
   reg [31:0] opB0_mux_out_X0hl;
   reg [31:0] opB1_mux_out_X0hl;
   reg [31:0] wdata_X0hl;
+  reg  [3:0] opA0_byp_mux_sel_X0hl;
+  reg  [3:0] opA1_byp_mux_sel_X0hl;
+  reg  [1:0] opA0_mux_sel_X0hl;
+  reg  [2:0] opA1_mux_sel_X0hl;
 
   always @ (posedge clk) begin
     if( !stall_X0hl ) begin
@@ -430,6 +434,10 @@ module riscv_CoreDpath
       pcB_X0hl          <= pcB_Dhl;
       branch_targ_X0hl  <= branch_targ_Dhl;
       opA0_mux_out_X0hl <= opA0_mux_out_Dhl;
+      opA0_byp_mux_sel_X0hl <= opA0_byp_mux_sel_Dhl;
+      opA1_byp_mux_sel_X0hl <= opA1_byp_mux_sel_Dhl;
+      opA0_mux_sel_X0hl     <= opA0_mux_sel_Dhl;
+      opA1_mux_sel_X0hl     <= opA1_mux_sel_Dhl;
       opA1_mux_out_X0hl <= opA1_mux_out_Dhl;
       opB0_mux_out_X0hl <= opB0_mux_out_Dhl;
       opB1_mux_out_X0hl <= opB1_mux_out_Dhl;
@@ -476,6 +484,24 @@ module riscv_CoreDpath
 
   assign dmemreq_msg_addr = aluA_out_X0hl;
   assign dmemreq_msg_data = wdata_X0hl;
+
+`ifndef SYNTHESIS
+  reg debug_hot;
+  initial debug_hot = $test$plusargs("debug-hot");
+
+  always @ (negedge clk) begin
+    if ( debug_hot ) begin
+      if ( (pcA_X0hl == 32'h00010220) || (pcA_X0hl == 32'h00010240) || (pcA_X0hl == 32'h00010308) || (pcA_X0hl == 32'h00010324) || (pcA_X0hl == 32'h00010260) ) begin
+        $display("HOT BR pc=%h op0=%h op1=%h eq=%b ne=%b", pcA_X0hl, opA0_mux_out_X0hl, opA1_mux_out_X0hl, branch_cond_eq_X0hl, branch_cond_ne_X0hl);
+        $display("HOT BR SEL pc=%h a0sel=%0d a0byp=%0d a1sel=%0d a1byp=%0d", pcA_X0hl, opA0_mux_sel_X0hl, opA0_byp_mux_sel_X0hl, opA1_mux_sel_X0hl, opA1_byp_mux_sel_X0hl);
+      end
+      if ( (pcA_X0hl == 32'h0001028c) || (pcA_X0hl == 32'h000102ac) || (pcA_X0hl == 32'h000102cc) || (pcA_X0hl == 32'h000102ec) || (pcA_X0hl == 32'h0001030c) || (pcA_X0hl == 32'h0001032c) || (pcA_X0hl == 32'h0001034c) || (pcA_X0hl == 32'h0001036c) || (pcA_X0hl == 32'h000104a0) || (pcA_X0hl == 32'h000104c0) || (pcA_X0hl == 32'h000104e0) ) begin
+        $display("HOT ST pc=%h addr=%h data=%h alu=%h op0=%h op1=%h", pcA_X0hl, dmemreq_msg_addr, dmemreq_msg_data, aluA_out_X0hl, opA0_mux_out_X0hl, opA1_mux_out_X0hl);
+        $display("HOT ST SEL pc=%h a0sel=%0d a0byp=%0d a1sel=%0d a1byp=%0d", pcA_X0hl, opA0_mux_sel_X0hl, opA0_byp_mux_sel_X0hl, opA1_mux_sel_X0hl, opA1_byp_mux_sel_X0hl);
+      end
+    end
+  end
+`endif
 
   // Muldiv Unit
 
@@ -658,8 +684,6 @@ module riscv_CoreDpath
   assign proc2csr_data_Whl = wbA_mux_out_Whl;
 
   // Writeback ports from Control
-  wire rfA_wen_Whl;
-  wire rfB_wen_Whl;
 
   riscv_CoreDpathRegfile rfile
   (
