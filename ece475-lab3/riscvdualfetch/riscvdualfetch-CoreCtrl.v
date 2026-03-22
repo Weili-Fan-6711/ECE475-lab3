@@ -100,7 +100,7 @@ module riscv_CoreCtrl
 
   // Only send a valid imem request if not stalled
 
-  wire   imemreq_val_Phl = reset || !stall_Phl;
+  wire   imemreq_val_Phl = ( reset === 1'b1 ) || ( stall_Phl !== 1'b1 );
   assign imemreq0_val     = imemreq_val_Phl;
   assign imemreq1_val     = imemreq_val_Phl;
 
@@ -147,7 +147,7 @@ module riscv_CoreCtrl
 
   // Is the current stage valid?
 
-  wire inst_val_Fhl = ( !bubble_Fhl && !squash_Fhl );
+  wire inst_val_Fhl = ( bubble_Fhl === 1'b0 ) && ( squash_Fhl === 1'b0 );
 
   // Squash instruction in F stage if branch taken for a valid
   // instruction or if there was an exception in X stage
@@ -402,7 +402,7 @@ module riscv_CoreCtrl
 
   // Is the current stage valid?
 
-  wire inst_val_Dhl = ( !bubble_Dhl && !squash_Dhl );
+  wire inst_val_Dhl = ( bubble_Dhl === 1'b0 ) && ( squash_Dhl === 1'b0 );
 
   // Parse instruction fields
 
@@ -596,24 +596,25 @@ module riscv_CoreCtrl
   // with ir0 as the first instruction of the new fetch pair.
   reg issue_second_inst_Dhl;
 
+  wire inst0_present_Dhl = inst_val_Dhl && ( ir0_Dhl != 32'b0 ) && ( cs0[`RISCV_INST_MSG_INST_VAL] === 1'b1 );
+  wire inst1_present_Dhl = inst_val_Dhl && ( ir1_Dhl != 32'b0 ) && ( cs1[`RISCV_INST_MSG_INST_VAL] === 1'b1 );
+  wire hold_pair_Dhl     = inst0_present_Dhl && inst1_present_Dhl && !cs0[`RISCV_INST_MSG_J_EN] && !squash_Dhl;
+
   always @(posedge clk) begin
     if (reset) begin
       issue_second_inst_Dhl <= 1'b0;
     end
-    else if (!active_stall_Dhl && !squash_Dhl && !brj_taken_Dhl) begin
-      // Toggle only when an instruction genuinely issues.
-      // Guard with !squash_Dhl: X0 branch squash must not toggle (branch target skipped).
-      // Guard with !brj_taken_Dhl: D-stage jump must not toggle (jump target skipped).
-      issue_second_inst_Dhl <= ~issue_second_inst_Dhl;
-    end
-    else if (brj_taken_Dhl) begin
-      // Jump resolved in D stage: reset to 0 so fresh fetch starts from ir0.
+    else if (squash_Dhl) begin
       issue_second_inst_Dhl <= 1'b0;
     end
-  end
-
+    else if (!stall_X0hl && !stall_0_Dhl && !squash_Dhl) begin
+      if (steering_mux_sel_Dhl == 1'b0)
+        issue_second_inst_Dhl <= (inst0_present_Dhl && inst1_present_Dhl && !cs0[`RISCV_INST_MSG_J_EN]) ? 1'b1 : 1'b0;
+      else
+        issue_second_inst_Dhl <= 1'b0;
+    end
+    end
   assign steering_mux_sel_Dhl = issue_second_inst_Dhl;
-
   // For Part 1, we issue down Pipeline A based on the steering mux,
   // and send an invalid instruction (0) down Pipeline B.
   assign instA_Dhl = (steering_mux_sel_Dhl == 1'b0) ? ir0_Dhl : ir1_Dhl;
@@ -621,12 +622,19 @@ module riscv_CoreCtrl
 
   // Jump and Branch Controls
 
-  wire       brj_taken_Dhl = (steering_mux_sel_Dhl == 1'b0) ? ( inst_val_Dhl && cs0[`RISCV_INST_MSG_J_EN] ) : ( inst_val_Dhl && cs1[`RISCV_INST_MSG_J_EN] );
-  wire [2:0] br_sel_Dhl    = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_BR_SEL] : cs1[`RISCV_INST_MSG_BR_SEL];
+  wire selected_inst_valid_Dhl = (steering_mux_sel_Dhl == 1'b0) ? inst0_present_Dhl : inst1_present_Dhl;
+
+  wire       brj_taken_Dhl = selected_inst_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_J_EN] : cs1[`RISCV_INST_MSG_J_EN] );
+  wire [2:0] br_sel_Dhl    = selected_inst_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_BR_SEL] : cs1[`RISCV_INST_MSG_BR_SEL] )
+    : br_none;
 
   // PC Mux Select
 
-  wire [1:0] pc_mux_sel_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_PC_SEL] : cs1[`RISCV_INST_MSG_PC_SEL];
+  wire [1:0] pc_mux_sel_Dhl = selected_inst_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_PC_SEL] : cs1[`RISCV_INST_MSG_PC_SEL] )
+    : pm_p;
 
   // Operand Bypassing Logic
 
@@ -636,8 +644,10 @@ module riscv_CoreCtrl
   wire [4:0] rs11_addr_Dhl  = inst1_rs1_Dhl;
   wire [4:0] rs21_addr_Dhl  = inst1_rs2_Dhl;
 
-  wire       rs10_en_Dhl    = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RS1_EN] : cs1[`RISCV_INST_MSG_RS1_EN];
-  wire       rs20_en_Dhl    = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RS2_EN] : cs1[`RISCV_INST_MSG_RS2_EN];
+  wire       rs10_en_Dhl    = selected_inst_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RS1_EN] : cs1[`RISCV_INST_MSG_RS1_EN] );
+  wire       rs20_en_Dhl    = selected_inst_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RS2_EN] : cs1[`RISCV_INST_MSG_RS2_EN] );
 
   wire       rs11_en_Dhl    = 1'b0; // Unused for Part 1
   wire       rs21_en_Dhl    = 1'b0; // Unused for Part 1
@@ -848,46 +858,52 @@ module riscv_CoreCtrl
 
   // Muldiv Function
 
-  assign muldivreq_msg_fn_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_FN] : cs1[`RISCV_INST_MSG_MULDIV_FN];
+  assign muldivreq_msg_fn_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_FN] : cs1[`RISCV_INST_MSG_MULDIV_FN] )
+    : 3'd0;
 
-  // Muldiv Controls
+  wire inst_sidefx_valid_Dhl = selected_inst_valid_Dhl;
 
-  wire muldivreq_val_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_EN] : cs1[`RISCV_INST_MSG_MULDIV_EN];
+  wire muldivreq_val_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_EN] : cs1[`RISCV_INST_MSG_MULDIV_EN] );
 
-  // Muldiv Mux Select
+  wire muldiv_mux_sel_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_SEL] : cs1[`RISCV_INST_MSG_MULDIV_SEL] )
+    : 1'b0;
 
-  wire muldiv_mux_sel_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_SEL] : cs1[`RISCV_INST_MSG_MULDIV_SEL];
+  wire execute_mux_sel_Dhl = muldivreq_val_Dhl;
 
-  // Execute Mux Select
+  wire is_load_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] == ld ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] == ld ) );
 
-  wire execute_mux_sel_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MULDIV_EN] : cs1[`RISCV_INST_MSG_MULDIV_EN];
+  wire dmemreq_msg_rw_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] == st ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] == st ) );
+  wire [1:0] dmemreq_msg_len_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MEM_LEN] : cs1[`RISCV_INST_MSG_MEM_LEN] )
+    : 2'd0;
+  wire dmemreq_val_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] != nr ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] != nr ) );
 
-  wire       is_load_Dhl         = (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] == ld ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] == ld );
+  wire [2:0] dmemresp_mux_sel_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MEM_SEL] : cs1[`RISCV_INST_MSG_MEM_SEL] )
+    : 3'd0;
 
-  wire       dmemreq_msg_rw_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] == st ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] == st );
-  wire [1:0] dmemreq_msg_len_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MEM_LEN] : cs1[`RISCV_INST_MSG_MEM_LEN];
-  wire       dmemreq_val_Dhl     = (steering_mux_sel_Dhl == 1'b0) ? ( cs0[`RISCV_INST_MSG_MEM_REQ] != nr ) : ( cs1[`RISCV_INST_MSG_MEM_REQ] != nr );
+  wire memex_mux_sel_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_WB_SEL] : cs1[`RISCV_INST_MSG_WB_SEL] )
+    : 1'b0;
 
-  // Memory response mux select
+  wire rf0_wen_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RF_WEN] : cs1[`RISCV_INST_MSG_RF_WEN] );
+  wire [4:0] rf0_waddr_Dhl = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RF_WADDR] : cs1[`RISCV_INST_MSG_RF_WADDR] )
+    : 5'd0;
 
-  wire [2:0] dmemresp_mux_sel_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_MEM_SEL] : cs1[`RISCV_INST_MSG_MEM_SEL];
+  wire csr_wen_Dhl = inst_sidefx_valid_Dhl
+    && ( (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_CSR_WEN] : cs1[`RISCV_INST_MSG_CSR_WEN] );
 
-  // Writeback Mux Select
-
-  wire memex_mux_sel_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_WB_SEL] : cs1[`RISCV_INST_MSG_WB_SEL];
-
-  // Register Writeback Controls
-
-  wire rf0_wen_Dhl         = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RF_WEN] : cs1[`RISCV_INST_MSG_RF_WEN];
-  wire [4:0] rf0_waddr_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_RF_WADDR] : cs1[`RISCV_INST_MSG_RF_WADDR];
-
-  // CSR register write enable
-
-  wire csr_wen_Dhl = (steering_mux_sel_Dhl == 1'b0) ? cs0[`RISCV_INST_MSG_CSR_WEN] : cs1[`RISCV_INST_MSG_CSR_WEN];
-
-  // CSR register address
-
-  wire [11:0] csr_addr_Dhl  = (steering_mux_sel_Dhl == 1'b0) ? ir0_Dhl[31:20] : ir1_Dhl[31:20];
+  wire [11:0] csr_addr_Dhl  = inst_sidefx_valid_Dhl
+    ? ( (steering_mux_sel_Dhl == 1'b0) ? ir0_Dhl[31:20] : ir1_Dhl[31:20] )
+    : 12'd0;
 
   //----------------------------------------------------------------------
   // Squash and Stall Logic
@@ -991,7 +1007,9 @@ module riscv_CoreCtrl
   wire stall_0_Dhl = (stall_X0hl || stall_0_muldiv_use_Dhl || stall_0_load_use_Dhl);
   wire stall_1_Dhl = (stall_X0hl || stall_1_muldiv_use_Dhl || stall_1_load_use_Dhl);
 
-  assign stall_Dhl = (steering_mux_sel_Dhl == 1'b0) ? 1'b1 : stall_0_Dhl;
+  assign stall_Dhl = ( steering_mux_sel_Dhl == 1'b0 )
+                   ? ( stall_0_Dhl || hold_pair_Dhl )
+                   :   stall_0_Dhl;
 
   // Next bubble bit
   // The D stage injects a bubble into X0 if the active instruction is squash or stalled.
@@ -1032,10 +1050,28 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
+      br_sel_X0hl           <= br_none;
+      alu0_fn_X0hl          <= 4'd0;
+      muldivreq_val_X0hl    <= 1'b0;
+      muldivreq_msg_fn_X0hl <= 3'd0;
+      muldiv_mux_sel_X0hl   <= 1'b0;
+      execute_mux_sel_X0hl  <= 1'b0;
+      is_load_X0hl          <= 1'b0;
+      is_muldiv_X0hl        <= 1'b0;
+      dmemreq_msg_rw_X0hl   <= 1'b0;
+      dmemreq_msg_len_X0hl  <= 2'd0;
+      dmemreq_val_X0hl      <= 1'b0;
+      dmemresp_mux_sel_X0hl <= 3'd0;
+      memex_mux_sel_X0hl    <= 1'b0;
+      rf0_wen_X0hl          <= 1'b0;
+      rf0_waddr_X0hl        <= 5'd0;
+      csr_wen_X0hl          <= 1'b0;
+      csr_addr_X0hl         <= 12'd0;
       bubble_X0hl <= 1'b1;
     end
     else if( !stall_X0hl ) begin
-      ir0_X0hl              <= ir0_Dhl;
+      // ir0_X0hl              <= ir0_Dhl;
+      ir0_X0hl              <= instA_Dhl;
       ir1_X0hl              <= ir1_Dhl;
       br_sel_X0hl           <= br_sel_Dhl;
       alu0_fn_X0hl          <= alu0_fn_Dhl;
@@ -1066,7 +1102,7 @@ module riscv_CoreCtrl
 
   // Is the current stage valid?
 
-  wire inst_val_X0hl = ( !bubble_X0hl && !squash_X0hl );
+  wire inst_val_X0hl = ( bubble_X0hl === 1'b0 ) && ( squash_X0hl === 1'b0 );
 
   // Muldiv request
 
@@ -1160,7 +1196,7 @@ module riscv_CoreCtrl
       ir1_X1hl              <= ir1_X0hl;
       is_load_X1hl          <= is_load_X0hl;
       is_muldiv_X1hl        <= is_muldiv_X0hl;
-      dmemreq_val_X1hl      <= dmemreq_val;
+      dmemreq_val_X1hl      <= dmemreq_val_X0hl;
       dmemresp_mux_sel_X1hl <= dmemresp_mux_sel_X0hl;
       memex_mux_sel_X1hl    <= memex_mux_sel_X0hl;
       execute_mux_sel_X1hl  <= execute_mux_sel_X0hl;
@@ -1180,7 +1216,7 @@ module riscv_CoreCtrl
 
   // Is current stage valid?
 
-  wire inst_val_X1hl = ( !bubble_X1hl && !squash_X1hl );
+  wire inst_val_X1hl = ( bubble_X1hl === 1'b0 ) && ( squash_X1hl === 1'b0 );
 
   // Data memory queue control signals
 
@@ -1257,7 +1293,7 @@ module riscv_CoreCtrl
 
   // Is current stage valid?
 
-  wire inst_val_X2hl = ( !bubble_X2hl && !squash_X2hl );
+  wire inst_val_X2hl = ( bubble_X2hl === 1'b0 ) && ( squash_X2hl === 1'b0 );
 
   // Dummy Squash Signal
 
@@ -1317,7 +1353,7 @@ module riscv_CoreCtrl
 
   // Is current stage valid?
 
-  wire inst_val_X3hl = ( !bubble_X3hl && !squash_X3hl );
+  wire inst_val_X3hl = ( bubble_X3hl === 1'b0 ) && ( squash_X3hl === 1'b0 );
 
   // Dummy Squash Signal
 
@@ -1373,7 +1409,7 @@ module riscv_CoreCtrl
 
   // Is current stage valid?
 
-  wire inst_val_Whl = ( !bubble_Whl && !squash_Whl );
+  wire inst_val_Whl = ( bubble_Whl === 1'b0 ) && ( squash_Whl === 1'b0 );
 
   // Only set register file wen if stage is valid
 
@@ -1536,17 +1572,17 @@ module riscv_CoreCtrl
       if ( stats_en || csr_stats ) begin
         num_cycles = num_cycles + 1;
 
-        // Count instructions for every cycle not squashed or stalled
-
-        // FIXME: fix this when you can have at most two instructions issued per cycle!
-        if ( inst_val_Dhl && !stall_Dhl ) begin
+        // Count the instruction that actually issues into Pipeline A.
+        // Pair-hold can assert stall_Dhl even when the first instruction issued.
+        if ( selected_inst_valid_Dhl && !active_stall_Dhl ) begin
           num_inst = num_inst + 1;
+        end
         end
 
       end
 
     end
-  end
+
 
   `endif
 
