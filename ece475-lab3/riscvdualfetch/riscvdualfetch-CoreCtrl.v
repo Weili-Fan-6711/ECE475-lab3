@@ -927,9 +927,6 @@ module riscv_CoreCtrl
                            || ( inst_val_X2hl && rs10_en_Dhl && rfA_wen_X2hl
                                 && ( rs10_addr_Dhl == rfA_waddr_X2hl )
                                 && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                           || ( inst_val_X3hl && rs10_en_Dhl && rfA_wen_X3hl
-                                && ( rs10_addr_Dhl == rfA_waddr_X3hl )
-                                && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                            || ( inst_val_X0hl && rs20_en_Dhl && rfA_wen_X0hl
                                 && ( rs20_addr_Dhl == rfA_waddr_X0hl )
                                 && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -938,10 +935,7 @@ module riscv_CoreCtrl
                                 && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                            || ( inst_val_X2hl && rs20_en_Dhl && rfA_wen_X2hl
                                 && ( rs20_addr_Dhl == rfA_waddr_X2hl )
-                                && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                           || ( inst_val_X3hl && rs20_en_Dhl && rfA_wen_X3hl
-                                && ( rs20_addr_Dhl == rfA_waddr_X3hl )
-                                && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
   wire stall_1_muldiv_use_Dhl = inst_val_Dhl && (
                               ( inst_val_X0hl && rs11_en_Dhl && rfA_wen_X0hl
                                 && ( rs11_addr_Dhl == rfA_waddr_X0hl )
@@ -952,9 +946,6 @@ module riscv_CoreCtrl
                            || ( inst_val_X2hl && rs11_en_Dhl && rfA_wen_X2hl
                                 && ( rs11_addr_Dhl == rfA_waddr_X2hl )
                                 && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                           || ( inst_val_X3hl && rs11_en_Dhl && rfA_wen_X3hl
-                                && ( rs11_addr_Dhl == rfA_waddr_X3hl )
-                                && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl )
                            || ( inst_val_X0hl && rs21_en_Dhl && rfA_wen_X0hl
                                 && ( rs21_addr_Dhl == rfA_waddr_X0hl )
                                 && ( rfA_waddr_X0hl != 5'd0 ) && is_muldiv_X0hl )
@@ -963,10 +954,7 @@ module riscv_CoreCtrl
                                 && ( rfA_waddr_X1hl != 5'd0 ) && is_muldiv_X1hl )
                            || ( inst_val_X2hl && rs21_en_Dhl && rfA_wen_X2hl
                                 && ( rs21_addr_Dhl == rfA_waddr_X2hl )
-                                && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl )
-                           || ( inst_val_X3hl && rs21_en_Dhl && rfA_wen_X3hl
-                                && ( rs21_addr_Dhl == rfA_waddr_X3hl )
-                                && ( rfA_waddr_X3hl != 5'd0 ) && is_muldiv_X3hl ));
+                                && ( rfA_waddr_X2hl != 5'd0 ) && is_muldiv_X2hl ));
 
   // Stall for load-use only if instruction in D is valid and either of
   // the source registers match the destination register of of a valid
@@ -976,29 +964,17 @@ module riscv_CoreCtrl
                             ( inst_val_X0hl && rs10_en_Dhl && rfA_wen_X0hl
                               && ( rs10_addr_Dhl == rfA_waddr_X0hl )
                               && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                         || ( inst_val_X1hl && rs10_en_Dhl && rfA_wen_X1hl
-                              && ( rs10_addr_Dhl == rfA_waddr_X1hl )
-                              && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
                          || ( inst_val_X0hl && rs20_en_Dhl && rfA_wen_X0hl
                               && ( rs20_addr_Dhl == rfA_waddr_X0hl )
-                              && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                         || ( inst_val_X1hl && rs20_en_Dhl && rfA_wen_X1hl
-                              && ( rs20_addr_Dhl == rfA_waddr_X1hl )
-                              && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
+                              && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl ) );
 
   wire stall_1_load_use_Dhl = inst_val_Dhl && (
                             ( inst_val_X0hl && rs11_en_Dhl && rfA_wen_X0hl
                               && ( rs11_addr_Dhl == rfA_waddr_X0hl )
                               && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                         || ( inst_val_X1hl && rs11_en_Dhl && rfA_wen_X1hl
-                              && ( rs11_addr_Dhl == rfA_waddr_X1hl )
-                              && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl )
                          || ( inst_val_X0hl && rs21_en_Dhl && rfA_wen_X0hl
                               && ( rs21_addr_Dhl == rfA_waddr_X0hl )
-                              && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl )
-                         || ( inst_val_X1hl && rs21_en_Dhl && rfA_wen_X1hl
-                              && ( rs21_addr_Dhl == rfA_waddr_X1hl )
-                              && ( rfA_waddr_X1hl != 5'd0 ) && is_load_X1hl ) );
+                              && ( rfA_waddr_X0hl != 5'd0 ) && is_load_X0hl ) );
 
   // Aggregate Stall Signal
 
