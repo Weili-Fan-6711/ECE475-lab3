@@ -67,6 +67,7 @@ module riscv_CoreDpath
   input         stall_Whl,
   input         ir0_valid_issue,
   input         ir1_valid_issue,
+  input         retain_second_Dhl,
 
   // Control Signals (dpath->ctrl)
 
@@ -155,9 +156,16 @@ module riscv_CoreDpath
 
   always @ (posedge clk) begin
     if( !stall_Dhl ) begin
-      pc_Dhl       <= pc_Fhl;
-      pc_plus4_Dhl <= pc_plus4_Fhl;
-      pc_plus8_Dhl <= pc_plus8_Fhl;
+      if ( retain_second_Dhl ) begin
+        pc_Dhl       <= pc_plus4_Dhl;
+        pc_plus4_Dhl <= pc_plus8_Dhl;
+        pc_plus8_Dhl <= pc_plus8_Dhl + 32'd4;
+      end
+      else begin
+        pc_Dhl       <= pc_Fhl;
+        pc_plus4_Dhl <= pc_plus4_Fhl;
+        pc_plus8_Dhl <= pc_plus8_Fhl;
+      end
     end
   end
 

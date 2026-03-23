@@ -104,6 +104,7 @@ module riscv_Core
   wire        stall_Whl;
   wire        ir0_valid_issue;
   wire        ir1_valid_issue;
+  wire        retain_second_Dhl;
 
   wire        branch_cond_eq_X0hl;
   wire        branch_cond_ne_X0hl;
@@ -244,6 +245,7 @@ module riscv_Core
     .stall_Whl               (stall_Whl),
     .ir0_valid_issue         (ir0_valid_issue),
     .ir1_valid_issue          (ir1_valid_issue),
+    .retain_second_Dhl       (retain_second_Dhl),
 
     // Control Signals (dpath->ctrl)
 
@@ -321,6 +323,7 @@ module riscv_Core
     .stall_Whl                (stall_Whl),
     .ir0_valid_issue           (ir0_valid_issue),
     .ir1_valid_issue           (ir1_valid_issue),
+    .retain_second_Dhl        (retain_second_Dhl),
 
     // Control Signals (dpath->ctrl)
 
