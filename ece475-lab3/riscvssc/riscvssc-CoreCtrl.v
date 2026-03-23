@@ -780,6 +780,7 @@ module riscv_CoreCtrl
   // A D-stage jump in inst0 redirects control immediately, so inst1 must not issue
   // from the same fetch pair or it will behave like a delay-slot instruction.
   assign ir1_valid_issue = (inst_val_raw_Dhl === 1'b1) && cs1_valid && !stall_1_hazard_Dhl
+                           && !( cs1[`RISCV_INST_MSG_J_EN] || ( cs1[`RISCV_INST_MSG_BR_SEL] != br_none ) )
                            && !(ir0_is_jump_Dhl && ir0_valid_issue);
 
   assign instA_Dhl = (steer_inst0_to_B_Dhl) ? (ir1_valid_issue ? ir1_Dhl : 32'b0)
