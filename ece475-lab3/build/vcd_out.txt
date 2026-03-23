@@ -1,0 +1,15 @@
+Found symbols: {'clk': '?', 's_W': '~"', 's_X2': '!#', 's_X3': '"#', 's_X1': '$#', 's_X0': '%#', 'mdiv_val': '6#', 'inst': 'C%', 'PC': '}+', 'wbA_out': 'H,'}
+Cycle  165 | PC: 801d0 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  166 | PC: 801d8 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  167 | PC: 801e0 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  168 | PC: 801dc | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  169 | PC: 801e4 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  170 | PC: 801ec | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  171 | PC: 801e8 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  172 | PC: 801f0 | MDivV: 0 | stalls: 00000 | wbA: 1010000000011011000001000100
+Cycle  173 | PC: 801f0 | MDivV: 0 | stalls: 00000 | wbA: 1010000
+Cycle  174 | PC: 801f0 | MDivV: 1 | stalls: 00000 | wbA: 0
+Cycle  175 | PC: 801f0 | MDivV: 0 | stalls: 00000 | wbA: 11111111111111111101111101110101
+Cycle  176 | PC: 801ec | MDivV: 0 | stalls: 00000 | wbA: 11111111111111111110000000000000
+Cycle  177 | PC: 801f4 | MDivV: 0 | stalls: 00000 | wbA: x
+Cycle  178 | PC: 801fc | MDivV: 0 | stalls: 00000 | wbA: x

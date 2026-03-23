@@ -1,0 +1,1657 @@
+WARNING: ../riscvssc/riscvssc-sim.v:183: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+VCD info: dumpfile /home/sh6571/ECE475-lab3/ece475-lab3/tests/build/vmh/riscv-add.vcd opened for output.
+DEBUG D: cyc=5 ir0=00000113 ir1=00000193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=6 ir0=00000193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=8 ir0=00310233 ir1=00d00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=9 ir0=00d00e93 ir1=00000093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=10 ir0=00000093 ir1=38121263
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080000: 00000113:  addi   r02, r00, 00000000
+00080004: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=12 ir0=38121263 ir1=00100113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080004: 00000193:  addi   r03, r00, 00000000
+00080008: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=13 ir0=00100113 ir1=00100193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080008: 00000000:      undefined inst       
+00080008: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=14 ir0=00100193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080008: 00310233:  add    r04, r02, r03     
+0008000c: 00000000:      undefined inst       
+-----
+0008000c: 00d00e93:  addi   r29, r00, 0000000d
+00080010: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=16 ir0=00310233 ir1=00e00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080014: 00000093:  addi   r01, r00, 00000000
+00080010: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=17 ir0=00e00e93 ir1=00200093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080014: 00000000:      undefined inst       
+00080014: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=18 ir0=00200093 ir1=36121663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080014: 38121263:  bne    r04, r01, 00000384
+00080018: 00000000:      undefined inst       
+-----
+00080018: 00100113:  addi   r02, r00, 00000001
+0008001c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=20 ir0=36121663 ir1=00300113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008001c: 00100193:  addi   r03, r00, 00000001
+00080020: 00000000:      undefined inst       
+-----
+00080020: 00000000:      undefined inst       
+00080020: 00000000:      undefined inst       
+-----
+00080020: 00310233:  add    r04, r02, r03     
+00080024: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=23 ir0=00700193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080024: 00e00e93:  addi   r29, r00, 0000000e
+00080028: 00000000:      undefined inst       
+-----
+0008002c: 00200093:  addi   r01, r00, 00000002
+00080028: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=25 ir0=00310233 ir1=00f00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008002c: 00000000:      undefined inst       
+0008002c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=26 ir0=00f00e93 ir1=00a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008002c: 36121663:  bne    r04, r01, 0000036c
+00080030: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=27 ir0=00a00093 ir1=34121a63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=29 ir0=34121a63 ir1=00000113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080034: 00700193:  addi   r03, r00, 00000007
+00080038: 00000000:      undefined inst       
+-----
+00080038: 00000000:      undefined inst       
+00080038: 00000000:      undefined inst       
+-----
+00080038: 00310233:  add    r04, r02, r03     
+0008003c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=32 ir0=ffff81b7 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008003c: 00f00e93:  addi   r29, r00, 0000000f
+00080040: 00000000:      undefined inst       
+-----
+00080044: 00a00093:  addi   r01, r00, 0000000a
+00080040: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=34 ir0=00310233 ir1=01100e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080044: 00000000:      undefined inst       
+00080044: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=35 ir0=01100e93 ir1=ffff80b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080044: 34121a63:  bne    r04, r01, 00000354
+00080048: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=36 ir0=ffff80b7 ir1=32121e63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=38 ir0=32121e63 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008004c: ffff81b7:  lui    r03, ffff8000     
+00080050: 00000000:      undefined inst       
+-----
+00080050: 00000000:      undefined inst       
+00080050: 00000000:      undefined inst       
+-----
+00080050: 00310233:  add    r04, r02, r03     
+00080054: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=41 ir0=00000193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080054: 01100e93:  addi   r29, r00, 00000011
+00080058: 00000000:      undefined inst       
+-----
+0008005c: ffff80b7:  lui    r01, ffff8000     
+00080058: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=43 ir0=00310233 ir1=01200e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008005c: 00000000:      undefined inst       
+0008005c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=44 ir0=01200e93 ir1=800000b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008005c: 32121e63:  bne    r04, r01, 0000033c
+00080060: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=45 ir0=800000b7 ir1=32121263
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=47 ir0=32121263 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080064: 00000193:  addi   r03, r00, 00000000
+00080068: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=48 ir0=80000137 ir1=ffff81b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080068: 00000000:      undefined inst       
+00080068: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=49 ir0=ffff81b7 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080068: 00310233:  add    r04, r02, r03     
+0008006c: 00000000:      undefined inst       
+-----
+0008006c: 01200e93:  addi   r29, r00, 00000012
+00080070: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=51 ir0=00310233 ir1=01300e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080074: 800000b7:  lui    r01, 80000000     
+00080070: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=52 ir0=01300e93 ir1=7fff80b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080074: 00000000:      undefined inst       
+00080074: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=53 ir0=7fff80b7 ir1=30121663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080074: 32121263:  bne    r04, r01, 00000324
+00080078: 00000000:      undefined inst       
+-----
+00080078: 80000137:  lui    r02, 80000000     
+0008007c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=55 ir0=30121663 ir1=00000113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008007c: ffff81b7:  lui    r03, ffff8000     
+00080080: 00000000:      undefined inst       
+-----
+00080080: 00000000:      undefined inst       
+00080080: 00000000:      undefined inst       
+-----
+00080080: 00310233:  add    r04, r02, r03     
+00080084: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=58 ir0=000081b7 ir1=fff18193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080084: 01300e93:  addi   r29, r00, 00000013
+00080088: 00000000:      undefined inst       
+-----
+0008008c: 7fff80b7:  lui    r01, 7fff8000     
+00080088: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=60 ir0=fff18193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008008c: 00000000:      undefined inst       
+0008008c: 00000000:      undefined inst       
+-----
+0008008c: 30121663:  bne    r04, r01, 0000030c
+00080090: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=62 ir0=00310233 ir1=01500e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=63 ir0=01500e93 ir1=000080b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=64 ir0=000080b7 ir1=fff08093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080094: 000081b7:  lui    r03, 00008000     
+00080098: 00000000:      undefined inst       
+-----
+00080098: 00000000:      undefined inst       
+00080098: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=66 ir0=fff08093 ir1=2e121663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080098: fff18193:  addi   r03, r03, ffffffff
+0008009c: 00000000:      undefined inst       
+-----
+0008009c: 00000000:      undefined inst       
+0008009c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=68 ir0=2e121663 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008009c: 00310233:  add    r04, r02, r03     
+000800a0: 00000000:      undefined inst       
+-----
+000800a0: 01500e93:  addi   r29, r00, 00000015
+000800a4: 00000000:      undefined inst       
+-----
+000800a4: 000080b7:  lui    r01, 00008000     
+000800a8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=71 ir0=fff10113 ir1=00000193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800a8: 00000000:      undefined inst       
+000800a8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=72 ir0=00000193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800ac: fff08093:  addi   r01, r01, ffffffff
+000800a8: 00000000:      undefined inst       
+-----
+000800ac: 00000000:      undefined inst       
+000800ac: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=74 ir0=00310233 ir1=01600e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800ac: 2e121663:  bne    r04, r01, 000002ec
+000800b0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=75 ir0=01600e93 ir1=800000b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=76 ir0=800000b7 ir1=fff08093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800b4: fff10113:  addi   r02, r02, ffffffff
+000800b8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=78 ir0=fff08093 ir1=2c121663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800b8: 00000193:  addi   r03, r00, 00000000
+000800bc: 00000000:      undefined inst       
+-----
+000800bc: 00000000:      undefined inst       
+000800bc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=80 ir0=2c121663 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800bc: 00310233:  add    r04, r02, r03     
+000800c0: 00000000:      undefined inst       
+-----
+000800c0: 01600e93:  addi   r29, r00, 00000016
+000800c4: 00000000:      undefined inst       
+-----
+000800c4: 800000b7:  lui    r01, 80000000     
+000800c8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=83 ir0=fff10113 ir1=000081b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800c8: 00000000:      undefined inst       
+000800c8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=84 ir0=000081b7 ir1=fff18193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800cc: fff08093:  addi   r01, r01, ffffffff
+000800c8: 00000000:      undefined inst       
+-----
+000800cc: 00000000:      undefined inst       
+000800cc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=86 ir0=fff18193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800cc: 2c121663:  bne    r04, r01, 000002cc
+000800d0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=88 ir0=00310233 ir1=01700e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=89 ir0=01700e93 ir1=800080b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800d4: fff10113:  addi   r02, r02, ffffffff
+000800d8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=90 ir0=800080b7 ir1=ffe08093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800d8: 000081b7:  lui    r03, 00008000     
+000800dc: 00000000:      undefined inst       
+-----
+000800dc: 00000000:      undefined inst       
+000800dc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=92 ir0=ffe08093 ir1=2a121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800dc: fff18193:  addi   r03, r03, ffffffff
+000800e0: 00000000:      undefined inst       
+-----
+000800e0: 00000000:      undefined inst       
+000800e0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=94 ir0=2a121463 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000800e0: 00310233:  add    r04, r02, r03     
+000800e4: 00000000:      undefined inst       
+-----
+000800e4: 01700e93:  addi   r29, r00, 00000017
+000800e8: 00000000:      undefined inst       
+-----
+000800e8: 800080b7:  lui    r01, 80008000     
+000800ec: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=97 ir0=000081b7 ir1=fff18193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800ec: 00000000:      undefined inst       
+000800ec: 00000000:      undefined inst       
+-----
+000800f0: ffe08093:  addi   r01, r01, fffffffe
+000800ec: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=99 ir0=fff18193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800f0: 00000000:      undefined inst       
+000800f0: 00000000:      undefined inst       
+-----
+000800f0: 2a121463:  bne    r04, r01, 000002a8
+000800f4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=101 ir0=00310233 ir1=01900e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=102 ir0=01900e93 ir1=800080b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=103 ir0=800080b7 ir1=fff08093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800f8: 000081b7:  lui    r03, 00008000     
+000800fc: 00000000:      undefined inst       
+-----
+000800fc: 00000000:      undefined inst       
+000800fc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=105 ir0=fff08093 ir1=28121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000800fc: fff18193:  addi   r03, r03, ffffffff
+00080100: 00000000:      undefined inst       
+-----
+00080100: 00000000:      undefined inst       
+00080100: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=107 ir0=28121463 ir1=80000137
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080100: 00310233:  add    r04, r02, r03     
+00080104: 00000000:      undefined inst       
+-----
+00080104: 01900e93:  addi   r29, r00, 00000019
+00080108: 00000000:      undefined inst       
+-----
+00080108: 800080b7:  lui    r01, 80008000     
+0008010c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=110 ir0=fff10113 ir1=ffff81b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008010c: 00000000:      undefined inst       
+0008010c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=111 ir0=ffff81b7 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080110: fff08093:  addi   r01, r01, ffffffff
+0008010c: 00000000:      undefined inst       
+-----
+00080110: 00000000:      undefined inst       
+00080110: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=113 ir0=00310233 ir1=01a00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080110: 28121463:  bne    r04, r01, 00000288
+00080114: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=114 ir0=01a00e93 ir1=7fff80b7
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=115 ir0=7fff80b7 ir1=fff08093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080118: fff10113:  addi   r02, r02, ffffffff
+0008011c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=117 ir0=fff08093 ir1=26121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008011c: ffff81b7:  lui    r03, ffff8000     
+00080120: 00000000:      undefined inst       
+-----
+00080120: 00000000:      undefined inst       
+00080120: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=119 ir0=26121463 ir1=00000113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080120: 00310233:  add    r04, r02, r03     
+00080124: 00000000:      undefined inst       
+-----
+00080124: 01a00e93:  addi   r29, r00, 0000001a
+00080128: 00000000:      undefined inst       
+-----
+00080128: 7fff80b7:  lui    r01, 7fff8000     
+0008012c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=122 ir0=fff00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008012c: 00000000:      undefined inst       
+0008012c: 00000000:      undefined inst       
+-----
+00080130: fff08093:  addi   r01, r01, ffffffff
+0008012c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=124 ir0=00310233 ir1=01c00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080130: 00000000:      undefined inst       
+00080130: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=125 ir0=01c00e93 ir1=fff00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080130: 26121463:  bne    r04, r01, 00000268
+00080134: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=126 ir0=fff00093 ir1=24121863
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=128 ir0=24121863 ir1=fff00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080138: fff00193:  addi   r03, r00, ffffffff
+0008013c: 00000000:      undefined inst       
+-----
+0008013c: 00000000:      undefined inst       
+0008013c: 00000000:      undefined inst       
+-----
+0008013c: 00310233:  add    r04, r02, r03     
+00080140: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=131 ir0=00100193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080140: 01c00e93:  addi   r29, r00, 0000001c
+00080144: 00000000:      undefined inst       
+-----
+00080148: fff00093:  addi   r01, r00, ffffffff
+00080144: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=133 ir0=00310233 ir1=01d00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080148: 00000000:      undefined inst       
+00080148: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=134 ir0=01d00e93 ir1=00000093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080148: 24121863:  bne    r04, r01, 00000250
+0008014c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=135 ir0=00000093 ir1=22121c63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=137 ir0=22121c63 ir1=fff00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080150: 00100193:  addi   r03, r00, 00000001
+00080154: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=138 ir0=fff00113 ir1=fff00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080154: 00000000:      undefined inst       
+00080154: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=139 ir0=fff00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080154: 00310233:  add    r04, r02, r03     
+00080158: 00000000:      undefined inst       
+-----
+00080158: 01d00e93:  addi   r29, r00, 0000001d
+0008015c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=141 ir0=00310233 ir1=01e00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080160: 00000093:  addi   r01, r00, 00000000
+0008015c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=142 ir0=01e00e93 ir1=ffe00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080160: 00000000:      undefined inst       
+00080160: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=143 ir0=ffe00093 ir1=22121063
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080160: 22121c63:  bne    r04, r01, 00000238
+00080164: 00000000:      undefined inst       
+-----
+00080164: fff00113:  addi   r02, r00, ffffffff
+00080168: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=145 ir0=22121063 ir1=00d00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080168: fff00193:  addi   r03, r00, ffffffff
+0008016c: 00000000:      undefined inst       
+-----
+0008016c: 00000000:      undefined inst       
+0008016c: 00000000:      undefined inst       
+-----
+0008016c: 00310233:  add    r04, r02, r03     
+00080170: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=148 ir0=00b00193 ir1=00310133
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080170: 01e00e93:  addi   r29, r00, 0000001e
+00080174: 00000000:      undefined inst       
+-----
+00080178: ffe00093:  addi   r01, r00, fffffffe
+00080174: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=150 ir0=00310133 ir1=02400e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080178: 00000000:      undefined inst       
+00080178: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=151 ir0=02400e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080178: 22121063:  bne    r04, r01, 00000220
+0008017c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=152 ir0=01800093 ir1=20111463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=154 ir0=20111463 ir1=00e00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080180: 00b00193:  addi   r03, r00, 0000000b
+00080184: 00000000:      undefined inst       
+-----
+00080184: 00000000:      undefined inst       
+00080184: 00000000:      undefined inst       
+-----
+00080184: 00310133:  add    r02, r02, r03     
+00080188: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=157 ir0=00b00193 ir1=003101b3
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=1 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080188: 02400e93:  addi   r29, r00, 00000024
+0008018c: 00000000:      undefined inst       
+-----
+00080190: 01800093:  addi   r01, r00, 00000018
+0008018c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=159 ir0=003101b3 ir1=02500e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080190: 00000000:      undefined inst       
+00080190: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=160 ir0=02500e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080190: 20111463:  bne    r02, r01, 00000208
+00080194: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=161 ir0=01900093 ir1=1e119863
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=163 ir0=1e119863 ir1=00f00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080198: 00b00193:  addi   r03, r00, 0000000b
+0008019c: 00000000:      undefined inst       
+-----
+0008019c: 00000000:      undefined inst       
+0008019c: 00000000:      undefined inst       
+-----
+0008019c: 003101b3:  add    r03, r02, r03     
+000801a0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=166 ir0=002101b3 ir1=02600e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801a0: 02500e93:  addi   r29, r00, 00000025
+000801a4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=167 ir0=02600e93 ir1=01e00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801a8: 01900093:  addi   r01, r00, 00000019
+000801a4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=168 ir0=01e00093 ir1=1c119e63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801a8: 00000000:      undefined inst       
+000801a8: 00000000:      undefined inst       
+-----
+000801a8: 1e119863:  bne    r03, r01, 000001f0
+000801ac: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=170 ir0=1c119e63 ir1=01000113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801b0: 002101b3:  add    r03, r02, r02     
+000801b4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=173 ir0=00210133 ir1=02700e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801b4: 02600e93:  addi   r29, r00, 00000026
+000801b8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=174 ir0=02700e93 ir1=02000093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801bc: 01e00093:  addi   r01, r00, 0000001e
+000801b8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=175 ir0=02000093 ir1=1c111463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801bc: 00000000:      undefined inst       
+000801bc: 00000000:      undefined inst       
+-----
+000801bc: 1c119e63:  bne    r03, r01, 000001dc
+000801c0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=177 ir0=1c111463 ir1=00d00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=178 ir0=00d00113 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=179 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801c4: 00210133:  add    r02, r02, r02     
+000801c8: 00000000:      undefined inst       
+-----
+000801c8: 02700e93:  addi   r29, r00, 00000027
+000801cc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=181 ir0=00310233 ir1=00020393
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801d0: 02000093:  addi   r01, r00, 00000020
+000801cc: 00000000:      undefined inst       
+-----
+000801d0: 00000000:      undefined inst       
+000801d0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=183 ir0=00020393 ir1=02d00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801d0: 1c111463:  bne    r02, r01, 000001c8
+000801d4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=184 ir0=02d00e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801d4: 00d00113:  addi   r02, r00, 0000000d
+000801d8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=185 ir0=01800093 ir1=1a139663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801d8: 00b00193:  addi   r03, r00, 0000000b
+000801dc: 00000000:      undefined inst       
+-----
+000801dc: 00000000:      undefined inst       
+000801dc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=187 ir0=1a139663 ir1=00e00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801dc: 00310233:  add    r04, r02, r03     
+000801e0: 00000000:      undefined inst       
+-----
+000801e0: 00000000:      undefined inst       
+000801e0: 00000000:      undefined inst       
+-----
+000801e0: 00020393:  addi   r07, r04, 00000000
+000801e4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=190 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801e4: 02d00e93:  addi   r29, r00, 0000002d
+000801e8: 00000000:      undefined inst       
+-----
+000801ec: 01800093:  addi   r01, r00, 00000018
+000801e8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=192 ir0=00310233 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801ec: 00000000:      undefined inst       
+000801ec: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=193 ir0=00000013 ir1=00020393
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801ec: 1a139663:  bne    r07, r01, 000001ac
+000801f0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=194 ir0=00020393 ir1=02e00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=195 ir0=02e00e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=196 ir0=01900093 ir1=18139663
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000801f4: 00b00193:  addi   r03, r00, 0000000b
+000801f8: 00000000:      undefined inst       
+-----
+000801f8: 00000000:      undefined inst       
+000801f8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=198 ir0=18139663 ir1=00f00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000801f8: 00310233:  add    r04, r02, r03     
+000801fc: 00000000:      undefined inst       
+-----
+000801fc: 00000013:  nop                      
+00080200: 00000000:      undefined inst       
+-----
+00080200: 00020393:  addi   r07, r04, 00000000
+00080204: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=201 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080204: 02e00e93:  addi   r29, r00, 0000002e
+00080208: 00000000:      undefined inst       
+-----
+0008020c: 01900093:  addi   r01, r00, 00000019
+00080208: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=203 ir0=00310233 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008020c: 00000000:      undefined inst       
+0008020c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=204 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008020c: 18139663:  bne    r07, r01, 0000018c
+00080210: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=205 ir0=00000013 ir1=00020393
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=206 ir0=00020393 ir1=02f00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=207 ir0=02f00e93 ir1=01a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080214: 00b00193:  addi   r03, r00, 0000000b
+00080218: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=208 ir0=01a00093 ir1=16139463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080218: 00000000:      undefined inst       
+00080218: 00000000:      undefined inst       
+-----
+00080218: 00310233:  add    r04, r02, r03     
+0008021c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=210 ir0=16139463 ir1=00d00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008021c: 00000013:  nop                      
+00080220: 00000000:      undefined inst       
+-----
+00080220: 00000013:  nop                      
+00080224: 00000000:      undefined inst       
+-----
+00080224: 00020393:  addi   r07, r04, 00000000
+00080228: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=213 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080228: 02f00e93:  addi   r29, r00, 0000002f
+0008022c: 00000000:      undefined inst       
+-----
+00080230: 01a00093:  addi   r01, r00, 0000001a
+0008022c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=215 ir0=00310233 ir1=03100e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080230: 00000000:      undefined inst       
+00080230: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=216 ir0=03100e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080230: 16139463:  bne    r07, r01, 00000168
+00080234: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=217 ir0=01800093 ir1=14121863
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=219 ir0=14121863 ir1=00e00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080238: 00b00193:  addi   r03, r00, 0000000b
+0008023c: 00000000:      undefined inst       
+-----
+0008023c: 00000000:      undefined inst       
+0008023c: 00000000:      undefined inst       
+-----
+0008023c: 00310233:  add    r04, r02, r03     
+00080240: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=222 ir0=00b00193 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080240: 03100e93:  addi   r29, r00, 00000031
+00080244: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=223 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080248: 01800093:  addi   r01, r00, 00000018
+00080244: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=224 ir0=00310233 ir1=03200e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080248: 00000000:      undefined inst       
+00080248: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=225 ir0=03200e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080248: 14121863:  bne    r04, r01, 00000150
+0008024c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=226 ir0=01900093 ir1=12121a63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=228 ir0=12121a63 ir1=00f00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080250: 00b00193:  addi   r03, r00, 0000000b
+00080254: 00000000:      undefined inst       
+-----
+00080254: 00000013:  nop                      
+00080258: 00000000:      undefined inst       
+-----
+00080258: 00310233:  add    r04, r02, r03     
+0008025c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=231 ir0=00b00193 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008025c: 03200e93:  addi   r29, r00, 00000032
+00080260: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=232 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080264: 01900093:  addi   r01, r00, 00000019
+00080260: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=233 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080264: 00000000:      undefined inst       
+00080264: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=234 ir0=00310233 ir1=03300e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080264: 12121a63:  bne    r04, r01, 00000134
+00080268: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=235 ir0=03300e93 ir1=01a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=236 ir0=01a00093 ir1=10121a63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008026c: 00b00193:  addi   r03, r00, 0000000b
+00080270: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=238 ir0=10121a63 ir1=00d00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080270: 00000013:  nop                      
+00080274: 00000000:      undefined inst       
+-----
+00080274: 00000013:  nop                      
+00080278: 00000000:      undefined inst       
+-----
+00080278: 00310233:  add    r04, r02, r03     
+0008027c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=241 ir0=00000013 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008027c: 03300e93:  addi   r29, r00, 00000033
+00080280: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=242 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080284: 01a00093:  addi   r01, r00, 0000001a
+00080280: 00000000:      undefined inst       
+-----
+00080284: 00000000:      undefined inst       
+00080284: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=244 ir0=00310233 ir1=03400e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080284: 10121a63:  bne    r04, r01, 00000114
+00080288: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=245 ir0=03400e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=246 ir0=01800093 ir1=0e121c63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008028c: 00000013:  nop                      
+00080290: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=248 ir0=0e121c63 ir1=00e00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080290: 00b00193:  addi   r03, r00, 0000000b
+00080294: 00000000:      undefined inst       
+-----
+00080294: 00000000:      undefined inst       
+00080294: 00000000:      undefined inst       
+-----
+00080294: 00310233:  add    r04, r02, r03     
+00080298: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=251 ir0=00000013 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080298: 03400e93:  addi   r29, r00, 00000034
+0008029c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=252 ir0=00b00193 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802a0: 01800093:  addi   r01, r00, 00000018
+0008029c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=253 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802a0: 00000000:      undefined inst       
+000802a0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=254 ir0=00310233 ir1=03500e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802a0: 0e121c63:  bne    r04, r01, 000000f8
+000802a4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=255 ir0=03500e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=256 ir0=01900093 ir1=0c121c63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000802a8: 00000013:  nop                      
+000802ac: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=258 ir0=0c121c63 ir1=00f00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802ac: 00b00193:  addi   r03, r00, 0000000b
+000802b0: 00000000:      undefined inst       
+-----
+000802b0: 00000013:  nop                      
+000802b4: 00000000:      undefined inst       
+-----
+000802b4: 00310233:  add    r04, r02, r03     
+000802b8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=261 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802b8: 03500e93:  addi   r29, r00, 00000035
+000802bc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=262 ir0=00000013 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802c0: 01900093:  addi   r01, r00, 00000019
+000802bc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=263 ir0=00b00193 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000802c0: 00000000:      undefined inst       
+000802c0: 00000000:      undefined inst       
+-----
+000802c0: 0c121c63:  bne    r04, r01, 000000d8
+000802c4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=265 ir0=00310233 ir1=03600e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=266 ir0=03600e93 ir1=01a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=267 ir0=01a00093 ir1=0a121c63
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000802c8: 00000013:  nop                      
+000802cc: 00000000:      undefined inst       
+-----
+000802cc: 00000013:  nop                      
+000802d0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=269 ir0=0a121c63 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802d0: 00b00193:  addi   r03, r00, 0000000b
+000802d4: 00000000:      undefined inst       
+-----
+000802d4: 00000000:      undefined inst       
+000802d4: 00000000:      undefined inst       
+-----
+000802d4: 00310233:  add    r04, r02, r03     
+000802d8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=272 ir0=00d00113 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+000802d8: 03600e93:  addi   r29, r00, 00000036
+000802dc: 00000000:      undefined inst       
+-----
+000802e0: 01a00093:  addi   r01, r00, 0000001a
+000802dc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=274 ir0=00310233 ir1=03800e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802e0: 00000000:      undefined inst       
+000802e0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=275 ir0=03800e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802e0: 0a121c63:  bne    r04, r01, 000000b8
+000802e4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=276 ir0=01800093 ir1=0a121063
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=278 ir0=0a121063 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802e8: 00d00113:  addi   r02, r00, 0000000d
+000802ec: 00000000:      undefined inst       
+-----
+000802ec: 00000000:      undefined inst       
+000802ec: 00000000:      undefined inst       
+-----
+000802ec: 00310233:  add    r04, r02, r03     
+000802f0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=281 ir0=00e00113 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802f0: 03800e93:  addi   r29, r00, 00000038
+000802f4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=282 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802f8: 01800093:  addi   r01, r00, 00000018
+000802f4: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=283 ir0=00310233 ir1=03900e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802f8: 00000000:      undefined inst       
+000802f8: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=284 ir0=03900e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000802f8: 0a121063:  bne    r04, r01, 000000a0
+000802fc: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=285 ir0=01900093 ir1=08121263
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+DEBUG D: cyc=287 ir0=08121263 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080300: 00e00113:  addi   r02, r00, 0000000e
+00080304: 00000000:      undefined inst       
+-----
+00080304: 00000013:  nop                      
+00080308: 00000000:      undefined inst       
+-----
+00080308: 00310233:  add    r04, r02, r03     
+0008030c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=290 ir0=00f00113 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008030c: 03900e93:  addi   r29, r00, 00000039
+00080310: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=291 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080314: 01900093:  addi   r01, r00, 00000019
+00080310: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=292 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080314: 00000000:      undefined inst       
+00080314: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=293 ir0=00310233 ir1=03a00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080314: 08121263:  bne    r04, r01, 00000084
+00080318: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=294 ir0=03a00e93 ir1=01a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=295 ir0=01a00093 ir1=06121263
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008031c: 00f00113:  addi   r02, r00, 0000000f
+00080320: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=297 ir0=06121263 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080320: 00000013:  nop                      
+00080324: 00000000:      undefined inst       
+-----
+00080324: 00000013:  nop                      
+00080328: 00000000:      undefined inst       
+-----
+00080328: 00310233:  add    r04, r02, r03     
+0008032c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=300 ir0=00000013 ir1=00d00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008032c: 03a00e93:  addi   r29, r00, 0000003a
+00080330: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=301 ir0=00d00113 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080334: 01a00093:  addi   r01, r00, 0000001a
+00080330: 00000000:      undefined inst       
+-----
+00080334: 00000000:      undefined inst       
+00080334: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=303 ir0=00310233 ir1=03b00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080334: 06121263:  bne    r04, r01, 00000064
+00080338: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=304 ir0=03b00e93 ir1=01800093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=305 ir0=01800093 ir1=04121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+0008033c: 00000013:  nop                      
+00080340: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=307 ir0=04121463 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080340: 00d00113:  addi   r02, r00, 0000000d
+00080344: 00000000:      undefined inst       
+-----
+00080344: 00000000:      undefined inst       
+00080344: 00000000:      undefined inst       
+-----
+00080344: 00310233:  add    r04, r02, r03     
+00080348: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=310 ir0=00000013 ir1=00e00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080348: 03b00e93:  addi   r29, r00, 0000003b
+0008034c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=311 ir0=00e00113 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080350: 01800093:  addi   r01, r00, 00000018
+0008034c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=312 ir0=00000013 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080350: 00000000:      undefined inst       
+00080350: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=313 ir0=00310233 ir1=03c00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080350: 04121463:  bne    r04, r01, 00000048
+00080354: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=314 ir0=03c00e93 ir1=01900093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=315 ir0=01900093 ir1=02121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080358: 00000013:  nop                      
+0008035c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=317 ir0=02121463 ir1=00b00193
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008035c: 00e00113:  addi   r02, r00, 0000000e
+00080360: 00000000:      undefined inst       
+-----
+00080360: 00000013:  nop                      
+00080364: 00000000:      undefined inst       
+-----
+00080364: 00310233:  add    r04, r02, r03     
+00080368: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=320 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080368: 03c00e93:  addi   r29, r00, 0000003c
+0008036c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=321 ir0=00000013 ir1=00f00113
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080370: 01900093:  addi   r01, r00, 00000019
+0008036c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=322 ir0=00f00113 ir1=00310233
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080370: 00000000:      undefined inst       
+00080370: 00000000:      undefined inst       
+-----
+00080370: 02121463:  bne    r04, r01, 00000028
+00080374: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=324 ir0=00310233 ir1=03d00e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=325 ir0=03d00e93 ir1=01a00093
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=326 ir0=01a00093 ir1=00121463
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=1 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080378: 00000013:  nop                      
+0008037c: 00000000:      undefined inst       
+-----
+0008037c: 00000013:  nop                      
+00080380: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=328 ir0=00121463 ir1=00100e93
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080380: 00f00113:  addi   r02, r00, 0000000f
+00080384: 00000000:      undefined inst       
+-----
+00080384: 00000000:      undefined inst       
+00080384: 00000000:      undefined inst       
+-----
+00080384: 00310233:  add    r04, r02, r03     
+00080388: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=331 ir0=00100113 ir1=015e9073
+  val=1 cs0v=1 cs1v=1 steer=1
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080388: 03d00e93:  addi   r29, r00, 0000003d
+0008038c: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=332 ir0=015e9073 ir1=00201063
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=1 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=0
+00080390: 01a00093:  addi   r01, r00, 0000001a
+0008038c: 00000000:      undefined inst       
+-----
+00080390: 00000000:      undefined inst       
+00080390: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=334 ir0=00201063 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+00080390: 00121463:  bne    r04, r01, 00000008
+00080394: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=335 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=336 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+DEBUG D: cyc=337 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008039c: 00100113:  addi   r02, r00, 00000001
+00080398: 00000000:      undefined inst       
+-----
+*** FAILED *** (status =         61)
+--------------------------------------------
+ STATS                                      
+--------------------------------------------
+ status     =         61
+ num_cycles =        334
+ num_inst   =        346
+ ipc        = 1.035928
+DEBUG D: cyc=338 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+0008039c: 015e9073:  csrw   r00, r29, r21     
+000803a0: 00000000:      undefined inst       
+-----
+DEBUG D: cyc=339 ir0=00000013 ir1=00000013
+  val=1 cs0v=1 cs1v=1 steer=0
+  hazards: raw=0 waw=0 struct=0 sb0=0 sb1=0
+  issue: ir0_v=1 ir1_v=1
+000803a0: 00000000:      undefined inst       

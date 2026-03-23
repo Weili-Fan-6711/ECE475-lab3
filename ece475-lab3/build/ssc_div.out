@@ -1,0 +1,5 @@
+WARNING: ../riscvssc/riscvssc-sim.v:183: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+WARNING: ../riscvssc/riscvssc-sim.v:212: Invalid decimal value passed to $value$plusargs:
+                                         "riscv-div.vcd".
+VCD info: dumpfile /home/sh6571/ECE475-lab3/ece475-lab3/tests/build/vmh/riscv-div.vcd opened for output.
+*** FAILED *** (status =         44)
